@@ -1,0 +1,23 @@
+[[package]]
+name = "cc"
+version = "1.0.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "cmake"
+version = "0.1.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "cc 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "rust-and-c"
+version = "0.1.0"
+dependencies = [
+ "cmake 0.1.31 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum cc 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)" = "49ec142f5768efb5b7622aebc3fdbdbb8950a4b9ba996393cb76ef7466e8747d"
+"checksum cmake 0.1.31 (registry+https://github.com/rust-lang/crates.io-index)" = "95470235c31c726d72bf2e1f421adc1e65b9d561bf5529612cbe1a72da1467b3"

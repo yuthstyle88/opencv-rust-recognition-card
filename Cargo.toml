@@ -1,0 +1,12 @@
+[package]
+name = "rust-and-c"
+version = "0.1.0"
+authors = ["achary"]
+build="build.rs"
+
+[dependencies]
+
+[build-dependencies]
+cmake = "0.1.31"
+
+[build]
