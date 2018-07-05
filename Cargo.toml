@@ -1,5 +1,5 @@
 [package]
-name = "rust-and-c"
+name = "rust-and-cpp"
 version = "0.1.0"
 authors = ["achary"]
 build="build.rs"
@@ -8,5 +8,3 @@ build="build.rs"
 
 [build-dependencies]
 cmake = "0.1.31"
-
-[build]
