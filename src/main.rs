@@ -13,7 +13,7 @@ extern {
 
     // this is rustified prototype of the function from our C++ library
     #[link(name="foo++", kind="static")]
-    fn testcall_cpp(img: Mat);
+    fn testcall_cpp(img: Mat) -> i32;
 }
 
 // fn main() {
@@ -539,7 +539,7 @@ fn main() {
 
     // run().unwrap();
 
-    let filename = format!("src/{}", "sp002.png");
+    let filename = format!("src/{}", "sp.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,
@@ -548,7 +548,8 @@ fn main() {
         }
     };
     unsafe {
-         testcall_cpp(in_img);
+        let num =  testcall_cpp(in_img);
+        println!(">>> num -> {}",num);
      };
 /*
     display_picture_and_wait("main()", &in_img);
