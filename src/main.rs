@@ -8,8 +8,8 @@ extern {
     // `foo` and `foo++` stand here as names of the libraries (wihout lib prefix)
 
     // this is rustified prototype of the function from our C library
-    #[link(name="foo", kind="static")]
-    fn testcall(v: f32); 
+   /* #[link(name="foo", kind="static")]
+    fn testcall(v: f32); */
 
     // this is rustified prototype of the function from our C++ library
     #[link(name="foo++", kind="static")]

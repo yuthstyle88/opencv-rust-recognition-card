@@ -12,8 +12,6 @@ extern "C" {
 int thresh = 50, N = 11;
 const char* wndname = "Square Detection Demo";
 
-
-
 static double angle( Point pt1, Point pt2, Point pt0 )
 {
     double dx1 = pt1.x - pt0.x;
