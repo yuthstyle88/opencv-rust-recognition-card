@@ -4,29 +4,12 @@ extern crate image;
 extern crate libm;
 extern crate glam;
 extern {
-    // this tells we're declaring something living in the external library
-    // `foo` and `foo++` stand here as names of the libraries (wihout lib prefix)
-
-    // this is rustified prototype of the function from our C library
-   /* #[link(name="foo", kind="static")]
-    fn testcall(v: f32); */
-
     // this is rustified prototype of the function from our C++ library
-    #[link(name="foo++", kind="static")]
+    #[link(name="libhelper", kind="dynamic")]
     fn has_square(img: Mat) -> i32;
 }
 
-// fn main() {
-//     println!("Hello, world from Rust!");
-//
-//     // now it's time to call the external function
-//     // In rust this comes via unsafe code block.
-//     unsafe {
-//         testcall(3.14159);
-//         has_square(3.14159);
-//     };
-// }
-
+˚
 use opencv::{prelude::*, videoio, highgui, types};
 use opencv::imgcodecs::{imread, IMREAD_COLOR, IMREAD_GRAYSCALE, imwrite};
 use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value};
