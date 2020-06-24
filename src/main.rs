@@ -13,7 +13,7 @@ extern {
 
     // this is rustified prototype of the function from our C++ library
     #[link(name="foo++", kind="static")]
-    fn testcall_cpp(v: f32); 
+    fn testcall_cpp(img: Mat);
 }
 
 // fn main() {
@@ -547,11 +547,14 @@ fn main() {
             panic!("Fatal ERROR reading the image : {}. Is this file exist? Have you the right to read it? Is it empty? . Error : {:?}", filename, error)
         }
     };
-
+    unsafe {
+         testcall_cpp(in_img);
+     };
+/*
     display_picture_and_wait("main()", &in_img);
 
     let card_dataset = recognition_card(&in_img);
-    dbg!(card_dataset);
+    dbg!(card_dataset);*/
 
 }
 
