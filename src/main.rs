@@ -13,7 +13,7 @@ extern {
 
     // this is rustified prototype of the function from our C++ library
     #[link(name="foo++", kind="static")]
-    fn testcall_cpp(img: Mat) -> i32;
+    fn has_square(img: Mat) -> i32;
 }
 
 // fn main() {
@@ -23,7 +23,7 @@ extern {
 //     // In rust this comes via unsafe code block.
 //     unsafe {
 //         testcall(3.14159);
-//         testcall_cpp(3.14159);
+//         has_square(3.14159);
 //     };
 // }
 
@@ -548,7 +548,7 @@ fn main() {
         }
     };
     unsafe {
-        let num =  testcall_cpp(in_img);
+        let num =  has_square(in_img);
         println!(">>> num -> {}",num);
      };
 /*
