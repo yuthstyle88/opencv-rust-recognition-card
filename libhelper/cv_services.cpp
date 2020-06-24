@@ -110,11 +110,14 @@ void auto_close_line( Mat& image)
     // Since MORPH_X : 2,3,4,5 and 6
     Mat   dst ,gray;
     int operation = 4;
-    //cvtColor(image, gray, COLOR_BGR2GRAY);
-    //Canny(gray, gray, 0, 70, 5);
-
-   // cvtColor(image, gray, COLOR_BGR2GRAY);
-
+    cvtColor(image, gray, COLOR_BGR2GRAY);
+    Canny(gray, gray, 100, 190, 5);
+    imshow( "gray", gray );
+    int c = waitKey();
+    //cvtColor(gray, gray, COLOR_BGR2GRAY);
+    threshold(gray, image, 190, 255, THRESH_BINARY_INV);
+    imshow( "threshold", image );
+    c = waitKey();
     //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
     //imshow( "auto_close_line", dst );
     Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );

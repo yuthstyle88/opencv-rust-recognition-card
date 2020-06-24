@@ -671,7 +671,10 @@ fn chk_big_card(img: &Mat) -> bool {
 
     display_picture_and_wait ("chk_big_card", &img );
     let mut img_c = 0;
-
+    unsafe {
+        img_c =  has_square(img.clone().unwrap());
+        //println!(">>> num -> {}",num);
+    };
 
     let mut is_big_card = false;
     let zero_offset = Point::new(0, 0);
@@ -685,14 +688,13 @@ fn chk_big_card(img: &Mat) -> bool {
     let mut contours_vec= Vector::new();
 
     process_img_gray(&img, &mut img_gray, is_show);
-    process_img_canny(&img_gray, &mut img_cn, is_show);
+    //process_img_canny(&img_gray, &mut img_cn, is_show);
 
-    unsafe {
-        img_c =  has_square(img_cn.clone().unwrap());
-        //println!(">>> num -> {}",num);
-    };
+
 
     process_img_threshold(&img_cn, &mut img_ts, 70., 255., is_show);
+
+
 
     get_contours(&img_ts, &mut contours_vec, zero_offset);
     let mut area_count = 0;
