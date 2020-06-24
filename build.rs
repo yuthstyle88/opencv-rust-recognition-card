@@ -20,7 +20,7 @@ fn main()
     println!("cargo:rustc-link-lib=static=foo");    
     
 
-    println!("cargo:rustc-link-lib=static=foo++");
+    println!("cargo:rustc-link-lib=dylib=foo++");
 
     // C++ is bit more complicated, since platform specifics come to play
     let target  = env::var("TARGET").unwrap();
