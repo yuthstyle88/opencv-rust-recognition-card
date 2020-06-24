@@ -469,7 +469,7 @@ fn run() -> opencv::Result<()> {
     #[cfg(feature = "opencv-32")]
         let mut cam = VideoCapture::new_default(1)?;  // 0 is the default camera
     #[cfg(not(feature = "opencv-32"))]
-        let mut cam = VideoCapture::new(0, videoio::CAP_ANY)?;  // 0 is the default camera
+        let mut cam = VideoCapture::new(1, videoio::CAP_ANY)?;  // 0 is the default camera
     cam.set(CAP_PROP_FRAME_WIDTH, 1280.);
     cam.set(CAP_PROP_FRAME_HEIGHT, 720.);
     let opened = VideoCapture::is_opened(&cam)?;
@@ -519,8 +519,8 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    // run().unwrap();
-
+    run().unwrap();
+/*
     let filename = format!("src/{}", "sp.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
@@ -529,10 +529,7 @@ fn main() {
             panic!("Fatal ERROR reading the image : {}. Is this file exist? Have you the right to read it? Is it empty? . Error : {:?}", filename, error)
         }
     };
-    unsafe {
-        let num =  has_square(in_img);
-        println!(">>> num -> {}",num);
-     };
+   */
 /*
     display_picture_and_wait("main()", &in_img);
 
@@ -551,7 +548,7 @@ fn display_picture_and_wait (title :&str, img : &Mat ) {
 
 // Canny image
 fn process_img_canny(img: &Mat, dst: &mut Mat, show: bool){
-    canny(&img,dst,100.,200.,3,false);
+    canny(&img,dst,0.,50.,3,false);
     if true == show {
         imshow("process_img_canny", dst);
         let key = wait_key(0);
@@ -672,7 +669,9 @@ fn get_count_red(img: &Mat) -> i32 {
 
 fn chk_big_card(img: &Mat) -> bool {
 
-    // display_picture_and_wait ("chk_big_card", &img );
+    display_picture_and_wait ("chk_big_card", &img );
+    let mut img_c = 0;
+
 
     let mut is_big_card = false;
     let zero_offset = Point::new(0, 0);
@@ -687,6 +686,12 @@ fn chk_big_card(img: &Mat) -> bool {
 
     process_img_gray(&img, &mut img_gray, is_show);
     process_img_canny(&img_gray, &mut img_cn, is_show);
+
+    unsafe {
+        img_c =  has_square(img_cn.clone().unwrap());
+        //println!(">>> num -> {}",num);
+    };
+
     process_img_threshold(&img_cn, &mut img_ts, 70., 255., is_show);
 
     get_contours(&img_ts, &mut contours_vec, zero_offset);
@@ -718,8 +723,7 @@ fn sub_image(img: &Mat, center: Point_<f32>, theta: f64, width: i32, height: i32
             r.at::<i32>(x2 as i32);
 
             warp_affine(img, new_img.borrow_mut(), &r, shape, INTER_LINEAR, BORDER_CONSTANT, Scalar::default());
-            //let _result = imshow("rotate 1188881", &new_img);
-            //let _key = wait_key(0);
+
         }
         _ => {}
     }

@@ -9,8 +9,11 @@ using namespace cv;
 using namespace std;
 extern "C" {
 
-int thresh = 50, N = 11;
+int thresh = 70, N = 11;
 const char* wndname = "Square Detection Demo";
+int morph_elem = 0;
+int morph_size = 1;
+int morph_operator = 0;
 
 static double angle( Point pt1, Point pt2, Point pt0 )
 {
@@ -101,11 +104,34 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     }
     imshow(wndname, image);
 }
-int has_square(Mat &image) {
 
-    vector<vector<Point> > squares;
+void auto_close_line( Mat& image)
+{
+    // Since MORPH_X : 2,3,4,5 and 6
+    Mat   dst ,gray;
+    int operation = 4;
+    //cvtColor(image, gray, COLOR_BGR2GRAY);
+    //Canny(gray, gray, 0, 70, 5);
+
+   // cvtColor(image, gray, COLOR_BGR2GRAY);
+
+    //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
+    //imshow( "auto_close_line", dst );
+    Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );
+
+    /// Apply the specified morphology operation
+    morphologyEx( image, dst, operation, element );
+    imshow( "auto_close_line", dst );
+}
+
+
+
+int has_square(Mat &image) {
+    auto_close_line(image);
+  /*  vector<vector<Point> > squares;
     findSquares(image, squares);
-    drawSquares(image, squares);
+    drawSquares(image, squares);*/
+
     int c = waitKey();
     if( c == 27 )
 
