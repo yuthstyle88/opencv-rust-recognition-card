@@ -9,7 +9,6 @@ extern {
     fn has_square(img: Mat) -> i32;
 }
 
-˚
 use opencv::{prelude::*, videoio, highgui, types};
 use opencv::imgcodecs::{imread, IMREAD_COLOR, IMREAD_GRAYSCALE, imwrite};
 use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value};
