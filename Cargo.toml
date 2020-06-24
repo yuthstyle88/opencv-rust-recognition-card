@@ -5,6 +5,10 @@ authors = ["achary"]
 build="build.rs"
 
 [dependencies]
+opencv = {version = "0.41", features = ["contrib"]}
+image = "0.23.6"
+libm = "0.1.0"
+glam = "0.8.7"
 
 [build-dependencies]
 cmake = "0.1.31"

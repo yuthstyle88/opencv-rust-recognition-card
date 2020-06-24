@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/rust-and-cmake88.iml" filepath="$PROJECT_DIR$/.idea/rust-and-cmake88.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/rust-call-cpplib.iml" filepath="$PROJECT_DIR$/.idea/rust-call-cpplib.iml" />
     </modules>
   </component>
 </project>

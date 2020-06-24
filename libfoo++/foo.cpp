@@ -5,7 +5,7 @@ using namespace cv;
 extern "C" void testcall_cpp(float value)
 {
     Mat image;
-    image = imread( "/Users/yongyutjantaboot/CLionProjects/rust-and-cmake88/4.jpg", 1 );
+    image = imread( "4.jpg", 1 );
 
     if ( !image.data )
     {
