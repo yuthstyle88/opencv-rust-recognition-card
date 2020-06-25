@@ -79,8 +79,8 @@ impl From<usize> for CardLabel {
     }
 }
 
-const CORNER_WIDTH: i32 = 21;
-const CORNER_HEIGHT: i32 = 60;
+const CORNER_WIDTH: i32 = 23;
+const CORNER_HEIGHT: i32 = 70;
 const SUIT_WIDTH: i32 = 70;
 const SUIT_HEIGHT: i32 = 100;
 
@@ -127,10 +127,10 @@ fn split_card(src: &Mat, card: &mut Cards) {
         let _min_area_rect = min_area_rect(&cnt).unwrap();
         let angle = _min_area_rect.angle();
         let mut roi = bounding_rect(&cnt).unwrap();
-        roi.height = roi.height + 15;
+        roi.height = roi.height + 20;
         roi.width = roi.width + 15;
         roi.x = roi.x - 10;
-        roi.y = roi.y - 10;
+        roi.y = roi.y - 20;
 
 
         let out = Mat::roi(&src, roi).unwrap();
@@ -398,7 +398,7 @@ fn card_id(mut card: Mat, id: u8) -> Card {
 
     let is_big_card = chk_big_card(&card);
     println!(">>> is_big_card -> {}", is_big_card);
-    let mut x = 12;
+    let mut x = 7;
     // Cropped corner
     let mut corner_width = CORNER_WIDTH;
     if false == is_big_card {
@@ -407,7 +407,7 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     }
 
     // display_picture_and_wait("before cropped", &card);
-    let img_cropped = process_crop_img_by_size (&card,  x, 10, corner_width, CORNER_HEIGHT, is_show);
+    let img_cropped = process_crop_img_by_size (&card,  x, 5, corner_width, CORNER_HEIGHT, is_show);
     let count_red = get_count_red(&img_cropped);
 
     // Resize image
@@ -530,8 +530,8 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    // run().unwrap();
-
+    run().unwrap();
+/*
     let filename = format!("src/{}", "sp006.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
@@ -546,7 +546,7 @@ fn main() {
     let card_dataset = recognition_card(&in_img);
     dbg!(card_dataset);
 
-
+*/
 
     // let filename = format!("src/{}", "sp003.png");
 
