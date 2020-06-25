@@ -217,14 +217,22 @@ fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card
     println!(": count_red -> {}", count_red);
     println!(": suit -> {}", suit.to_string());
 
-    if suit == CardLabel::Hearts && 1000 > count_red {
-        suit_name = CardLabel::Spades;
-    } else if suit == CardLabel::Spades && 1000 < count_red { // is red
-        suit_name = CardLabel::Hearts;
-    }else if suit == CardLabel::Clubs && 1000 < count_red { // is red
-        suit_name = CardLabel::Diamonds;
-    }else if suit == CardLabel::Diamonds && 1000 <= count_red { // is red
-        suit_name = CardLabel::Clubs;
+    if suit == CardLabel::Diamonds {  // red
+        if 1000 >= count_red { // is black
+            suit_name = CardLabel::Clubs;
+        }
+    } else if suit == CardLabel::Clubs { // black
+        if 1000 < count_red { // is red
+            suit_name = CardLabel::Diamonds;
+        }
+    }else if suit == CardLabel::Hearts {  // red
+        if 1000 >= count_red { // is black
+            suit_name = CardLabel::Spades;
+        }
+    }else if suit == CardLabel::Spades {  // black
+        if 1000 < count_red { // is red
+            suit_name = CardLabel::Hearts;
+        }
     }
     println!(": suit_name -> {}", suit_name.to_string());
 
