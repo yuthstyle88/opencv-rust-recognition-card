@@ -105,32 +105,42 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     imshow(wndname, image);
 }
 
-void auto_close_line( Mat& image)
+Mat* auto_close_line(Mat *image, Mat& image2)
 {
     // Since MORPH_X : 2,3,4,5 and 6
-    Mat   dst ,gray;
+    Mat   dst;
+    Mat*  gray;
+   // imshow( "gray", image );
     int operation = 4;
-    //cvtColor(image, gray, COLOR_BGR2GRAY);
-    //Canny(gray, gray, 0, 70, 5);
+    //cvtColor(image, *gray, COLOR_BGR2GRAY);
+    //image2 = gray;
+   // Canny(gray, gray, 100, 190, 5);
 
-   // cvtColor(image, gray, COLOR_BGR2GRAY);
-
+   /* int c = waitKey();
+    //cvtColor(gray, gray, COLOR_BGR2GRAY);
+    threshold(gray, image, 190, 255, THRESH_BINARY_INV);
+    imshow( "threshold", image );
+    c = waitKey();
     //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
     //imshow( "auto_close_line", dst );
     Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );
 
     /// Apply the specified morphology operation
     morphologyEx( image, dst, operation, element );
-    imshow( "auto_close_line", dst );
+    imshow( "auto_close_line", dst );*/
+    return (Mat *) image;
 }
 
 
+/*
 
 int has_square(Mat &image) {
     auto_close_line(image);
-  /*  vector<vector<Point> > squares;
+  */
+/*  vector<vector<Point> > squares;
     findSquares(image, squares);
-    drawSquares(image, squares);*/
+    drawSquares(image, squares);*//*
+
 
     int c = waitKey();
     if( c == 27 )
@@ -139,5 +149,6 @@ int has_square(Mat &image) {
     // std::cout << " ooooooo Hello, world from C++! Value passed: " << value << std::endl;
     return (16);
 }
+*/
 
 }

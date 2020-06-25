@@ -6,7 +6,7 @@ extern crate glam;
 extern {
     // this is rustified prototype of the function from our C++ library
     #[link(name="libhelper", kind="dynamic")]
-    fn has_square(img: Mat) -> i32;
+    fn auto_close_line(img: Mat, img2: &mut Mat)-> Mat;
 }
 
 use opencv::{prelude::*, videoio, highgui, types};
@@ -671,10 +671,15 @@ fn chk_big_card(img: &Mat) -> bool {
 
     display_picture_and_wait ("chk_big_card", &img );
     let mut img_c = 0;
-
+    let  mut img_cn= Mat::default().unwrap();
+    unsafe {
+     let num =   auto_close_line(img.clone().unwrap(),&mut img_cn);
+       // println!(">>> num -> {}",num);
+        display_picture_and_wait ("auto_close_line", &num );
+    };
 
     let mut is_big_card = false;
-    let zero_offset = Point::new(0, 0);
+   /* let zero_offset = Point::new(0, 0);
     let morph_size = 0;
     let morph_elem = 10;
     let is_show = false;
@@ -685,14 +690,13 @@ fn chk_big_card(img: &Mat) -> bool {
     let mut contours_vec= Vector::new();
 
     process_img_gray(&img, &mut img_gray, is_show);
-    process_img_canny(&img_gray, &mut img_cn, is_show);
+    //process_img_canny(&img_gray, &mut img_cn, is_show);
 
-    unsafe {
-        img_c =  has_square(img_cn.clone().unwrap());
-        //println!(">>> num -> {}",num);
-    };
+
 
     process_img_threshold(&img_cn, &mut img_ts, 70., 255., is_show);
+
+
 
     get_contours(&img_ts, &mut contours_vec, zero_offset);
     let mut area_count = 0;
@@ -703,7 +707,7 @@ fn chk_big_card(img: &Mat) -> bool {
     }
     if 120 < tmp_area_count {
         is_big_card = true;
-    }
+    }*/
 
     is_big_card
 }
