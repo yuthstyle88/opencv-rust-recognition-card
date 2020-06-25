@@ -150,5 +150,16 @@ int has_square(Mat &image) {
     return (16);
 }
 */
+Mat* test_image(Mat *image) {
+    Mat *dst = new Mat();
+    Mat *gray = new Mat();
 
+    cvtColor(*image, *gray, COLOR_BGR2GRAY);
+//    threshold(gray, image, 190, 255, THRESH_BINARY_INV);
+//    int operation = 4;
+//    Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );
+//    morphologyEx( *image, *dst, operation, element );
+
+    return gray;
+}
 }
