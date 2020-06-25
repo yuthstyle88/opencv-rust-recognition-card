@@ -214,15 +214,19 @@ fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card
 
 
     let mut suit_name = suit ;
-    // println!(": count_red -> {}", count_red);
-    // println!(": suit -> {}", suit.to_string());
-    //
-    // if suit == CardLabel::Hearts && 1000 > count_red {
-    //     suit_name = CardLabel::Spades;
-    // } else if suit == CardLabel::Spades && 1000 < count_red { // is red
-    //     suit_name = CardLabel::Hearts;
-    // }
-    // println!(": suit_name -> {}", suit_name.to_string());
+    println!(": count_red -> {}", count_red);
+    println!(": suit -> {}", suit.to_string());
+
+    if suit == CardLabel::Hearts && 1000 > count_red {
+        suit_name = CardLabel::Spades;
+    } else if suit == CardLabel::Spades && 1000 < count_red { // is red
+        suit_name = CardLabel::Hearts;
+    }else if suit == CardLabel::Clubs && 1000 < count_red { // is red
+        suit_name = CardLabel::Diamonds;
+    }else if suit == CardLabel::Diamonds && 1000 <= count_red { // is red
+        suit_name = CardLabel::Clubs;
+    }
+    println!(": suit_name -> {}", suit_name.to_string());
 
     Card { id: rank as u8, name: suit_name.to_string(), location}
 }
@@ -530,9 +534,9 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    run().unwrap();
-/*
-    let filename = format!("src/{}", "sp006.png");
+    // run().unwrap();
+
+    let filename = format!("src/{}", "test.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,
@@ -546,7 +550,7 @@ fn main() {
     let card_dataset = recognition_card(&in_img);
     dbg!(card_dataset);
 
-*/
+
 
     // let filename = format!("src/{}", "sp003.png");
 
