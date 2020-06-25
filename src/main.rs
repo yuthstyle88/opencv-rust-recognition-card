@@ -442,7 +442,7 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     let mut img_count = 0;
     let mut res = vec![];
     for card_tuple in cards.card.into_iter() {
-        let (mut card_in, id,angle) = card_tuple;
+        let (mut card_in, id,mut angle) = card_tuple;
         let file_param :Vector<i32> = Vector::new();
         let fname = format!("test_{}.png",id);
         imwrite(&fname, &card_in, &file_param);
@@ -451,6 +451,8 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
         if width > height {
             card_in = rotate_image90(&card_in);
         }
+        let mut add_angle = 90.;
+        if angle  < -50.  {angle  =  add_angle + angle;} else {angle = angle - 1.0};
 
         //let angle = find_angle(&card_in);
         println!(" {}. recognition_card->angle : {}", img_count, angle);
