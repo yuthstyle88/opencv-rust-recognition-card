@@ -6,7 +6,7 @@ extern crate glam;
 extern {
     // this is rustified prototype of the function from our C++ library
     #[link(name="libhelper", kind="dynamic")]
-    fn has_square(img: Mat) -> i32;
+    fn auto_close_line(img: Mat, img2: &mut Mat)-> Mat;
 }
 
 use opencv::{prelude::*, videoio, highgui, types};
@@ -671,13 +671,15 @@ fn chk_big_card(img: &Mat) -> bool {
 
     display_picture_and_wait ("chk_big_card", &img );
     let mut img_c = 0;
+    let  mut img_cn= Mat::default().unwrap();
     unsafe {
-        img_c =  has_square(img.clone().unwrap());
-        //println!(">>> num -> {}",num);
+     let num =   auto_close_line(img.clone().unwrap(),&mut img_cn);
+       // println!(">>> num -> {}",num);
+        display_picture_and_wait ("auto_close_line", &num );
     };
 
     let mut is_big_card = false;
-    let zero_offset = Point::new(0, 0);
+   /* let zero_offset = Point::new(0, 0);
     let morph_size = 0;
     let morph_elem = 10;
     let is_show = false;
@@ -705,7 +707,7 @@ fn chk_big_card(img: &Mat) -> bool {
     }
     if 120 < tmp_area_count {
         is_big_card = true;
-    }
+    }*/
 
     is_big_card
 }
