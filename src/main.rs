@@ -151,7 +151,6 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
 
     let zero_offset = Point::new(0, 0);
     let mut vec = VectorOfMat::new();
-    // println!(">>> width={}, height={}", src.cols(), src.rows());
     match find_contours(&src, &mut vec, RETR_LIST, CHAIN_APPROX_SIMPLE, zero_offset) {
         Ok(_ok) => {
             println!("[OK] find contours");
@@ -162,32 +161,37 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
     };
 
     let mut last_rank_y = 0;
-    for cnt in vec.iter() {
-        let area = contour_area(&cnt, false).unwrap();
+    let mut area_selected:f64 = 1000.;
+    let mut idx = 0;
 
-        if area < 1500f64 {
+    // Find suit image
+    for cnt in vec.iter(){
+        let area = contour_area(&cnt, false).unwrap();
+        idx = idx + 1;
+        // println!(">>> {} area -> {}", idx, area);
+        if area < area_selected {
             continue;
         }
-        println!(">>> area -> {}", area);
+        // println!(">>> {} area selected -> {}", idx,  area);
         let mut roi = bounding_rect(&cnt).unwrap();
         let out = Mat::roi(&src, roi).unwrap();
+
         if true == is_first {
             suit_img = out;
             is_first = false;
-        } else {
-            last_rank_y = roi.y;
+            // println!(">>> {} suit -> {}", idx, area);
+        }else {
             rank_img = out;
+            // println!(">>> {} rank -> {}", idx, area);
         }
     }
-
-
 
     (rank_img, suit_img)
 }
 
 fn get_card_location(x: i32, y: i32) -> i32 {
 
-    println!("get_card_location() -> x={}, y={}",x,y);
+    println!("get_card_location() -> x= {}, y={}",x,y);
     let pair = (x, y);
     let rs = match pair {
         (x, y) if x > 800 && y > 300 => 1,
@@ -357,9 +361,6 @@ fn rotate_image90(src: &Mat) -> Mat {
 
 fn rotate_image(src: &Mat, angle: f64) -> Mat {
 
-    // let _result = imshow("rotat_img in", &src);
-    // let _key = wait_key(0);
-
     let size = src.size().unwrap();
     let width = size.width;
     let height = size.height;
@@ -393,15 +394,15 @@ fn card_id(mut card: Mat, id: u8) -> Card {
 
     let is_big_card = chk_big_card(&card);
     println!(">>> is_big_card -> {}", is_big_card);
-    let mut x = 7;
+    let mut x = 12;
     // Cropped corner
     let mut corner_width = CORNER_WIDTH;
     if false == is_big_card {
-        corner_width = CORNER_WIDTH + 10;
+        corner_width = CORNER_WIDTH;
         x = x + 5;
     }
 
-    display_picture_and_wait("card_id", &card);
+    // display_picture_and_wait("before cropped", &card);
     let img_cropped = process_crop_img_by_size (&card,  x, 10, corner_width, CORNER_HEIGHT, is_show);
     let count_red = get_count_red(&img_cropped);
 
@@ -449,11 +450,11 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
         let angle = find_angle(&card_in);
         println!(" {}. recognition_card->angle : {}", img_count, angle);
 
-        // imshow("recog_card in", &card_in);
-        // let _key = wait_key(0);
-
+        display_picture_and_wait("card_in" , &card_in);
         let rotate_img = rotate_image(&card_in, angle as f64);
+        display_picture_and_wait("rotate_img" , &rotate_img);
         let croped_img = crop_card(&rotate_img, 10000.);
+        display_picture_and_wait("croped_img" , &croped_img);
         let card_result = card_id(croped_img, id as u8);
 
         res.push(card_result);
@@ -522,8 +523,8 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    run().unwrap();
-/*
+    // run().unwrap();
+
     let filename = format!("src/{}", "sp.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
@@ -532,18 +533,20 @@ fn main() {
             panic!("Fatal ERROR reading the image : {}. Is this file exist? Have you the right to read it? Is it empty? . Error : {:?}", filename, error)
         }
     };
-   */
-/*
+
     display_picture_and_wait("main()", &in_img);
 
     let card_dataset = recognition_card(&in_img);
-    dbg!(card_dataset);*/
-    let filename = format!("src/{}", "sp.png");
+    dbg!(card_dataset);
 
-    let in_img = imread(&filename, IMREAD_COLOR).unwrap();
-    display_picture_and_wait("main() 1", &in_img);
-    let x = unsafe { test_image(in_img) };
-    display_picture_and_wait("main() 2", &x);
+
+
+    // let filename = format!("src/{}", "sp003.png");
+
+    // let in_img = imread(&filename, IMREAD_COLOR).unwrap();
+    // display_picture_and_wait("main() 1", &in_img);
+    // let x = unsafe { test_image(in_img) };
+    // display_picture_and_wait("main() 2", &x);
 }
 
 
@@ -702,6 +705,7 @@ fn sub_image(img: &Mat, center: Point_<f32>, theta: f64, width: i32, height: i32
     let shape = Size_::new(img.cols(), img.rows());
     let mut new_img = Mat::default().unwrap();
     let rot = get_rotation_matrix_2d(center, theta, 1f64);
+
     let bbox = RotatedRect::new(center, Size2f::new(width as f32, height as f32), theta as f32).unwrap();
     let bbox = bbox.bounding_rect2f().unwrap();
     let x1 = bbox.width / 2.0 - (img.cols() / 2) as f32;
@@ -766,6 +770,8 @@ fn find_angle(src: &Mat) -> f32 {
             line(&mut src, pt1, pt2, scalar, 1, LINE_AA, 0);
         }
     }
+
+    println!(">>> min_area_rect.angle() -> {} " , _min_area_rect.angle());
     let mut add_angle = 90.;
     let mut angle = _min_area_rect.angle();
 
