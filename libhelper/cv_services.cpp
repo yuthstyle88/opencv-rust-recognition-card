@@ -116,7 +116,7 @@ Mat* auto_close_line(Mat *image)
     int morph_size = 1;
     cvtColor(*image, *gray, COLOR_BGR2GRAY);
     //image2 = gray;
-    Canny(*gray, *gray, 100, 190, 5);
+    //Canny(*gray, *gray, 100, 190, 5);
 
     //int c = waitKey();
     //cvtColor(gray, gray, COLOR_BGR2GRAY);
