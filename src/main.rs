@@ -14,6 +14,12 @@ extern {
     // this is rustified prototype of the function from our C++ library
     #[link(name="foo++", kind="static")]
     fn testcall_cpp(img: Mat) -> i32;
+
+    #[link(name="foo++", kind="static")]
+    fn ex_display_imag_and_wait(img: Mat);
+
+
+
 }
 
 // fn main() {
@@ -548,8 +554,9 @@ fn main() {
         }
     };
     unsafe {
-        let num =  testcall_cpp(in_img);
-        println!(">>> num -> {}",num);
+        ex_display_imag_and_wait(in_img);
+        // println!(">>> num -> {}",num);
+        // ex_display_imag_and_wait(in_img);
      };
 /*
     display_picture_and_wait("main()", &in_img);
