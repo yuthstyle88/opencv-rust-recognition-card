@@ -122,7 +122,7 @@ Mat* auto_close_line(Mat *image)
     //cvtColor(gray, gray, COLOR_BGR2GRAY);
     threshold(*gray, *image, 190, 255, THRESH_BINARY_INV);
     //imshow( "threshold", *image );
-    int c = waitKey();
+   // int c = waitKey();
     //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
     //imshow( "auto_close_line", dst );
     Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );
