@@ -688,36 +688,17 @@ fn chk_big_card(img: &Mat) -> bool {
     };
 
     let mut is_big_card = false;
-   let zero_offset = Point::new(0, 0);
-    let morph_size = 0;
-    let morph_elem = 10;
-    let is_show = false;
 
-  /*  let mut img_gray= Mat::default().unwrap();
-    let mut img_cn= Mat::default().unwrap();
-    let mut img_ts= Mat::default().unwrap();
-    let mut contours_vec= Vector::new();
-
-    process_img_gray(&img, &mut img_gray, is_show);
-    //process_img_canny(&img_gray, &mut img_cn, is_show);
-
-
-
-    process_img_threshold(&img_cn, &mut img_ts, 70., 255., is_show);
-*/
-
+    let zero_offset = Point::new(0, 0);
     let mut contours_vec= Vector::new();
         get_contours(&res, &mut contours_vec, zero_offset);
-        let mut area_count = 0;
-        let mut tmp_area_count = 0;
         for cnt in contours_vec.iter() {
             let area = contour_area(&cnt, false).unwrap();
-            tmp_area_count = tmp_area_count + 1;
-        }
-        if 120 < tmp_area_count {
+            if 20000. > area {
+                continue;
+            }
             is_big_card = true;
         }
-
     is_big_card
 }
 
