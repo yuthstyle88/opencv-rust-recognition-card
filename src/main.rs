@@ -453,11 +453,10 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
             card_in = rotate_image90(&card_in);
         }
         let mut add_angle = 90.;
-        if angle  < -50.  {angle  =  add_angle + angle;} else {angle = angle - 1.0};
+        if angle  < -50.  {angle  =  add_angle + angle;} // else {angle = angle - 1.0};
 
         //let angle = find_angle(&card_in);
         println!(" {}. recognition_card->angle : {}", img_count, angle);
-
         display_picture_and_wait("card_in" , &card_in);
         let rotate_img = rotate_image(&card_in, angle as f64);
         display_picture_and_wait("rotate_img" , &rotate_img);
@@ -533,7 +532,7 @@ fn main() {
 
     // run().unwrap();
 
-    let filename = format!("src/{}", "sp.png");
+    let filename = format!("src/{}", "sp002.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,
