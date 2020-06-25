@@ -677,14 +677,10 @@ fn get_count_red(img: &Mat) -> i32 {
 
 fn chk_big_card(img: &Mat) -> bool {
 
-    display_picture_and_wait ("chk_big_card", &img );
-    let mut img_c = 0;
-    let  mut img_cn= Mat::default().unwrap();
     let mut res = Mat::default().unwrap();
     unsafe {
       res =   auto_close_line(img.clone().unwrap());
        // println!(">>> num -> {}",num);
-        display_picture_and_wait ("auto_close_line", &res );
     };
 
     let mut is_big_card = false;

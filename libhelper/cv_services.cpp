@@ -121,7 +121,7 @@ Mat* auto_close_line(Mat *image)
     //int c = waitKey();
     //cvtColor(gray, gray, COLOR_BGR2GRAY);
     threshold(*gray, *image, 190, 255, THRESH_BINARY_INV);
-    imshow( "threshold", *image );
+    //imshow( "threshold", *image );
     int c = waitKey();
     //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
     //imshow( "auto_close_line", dst );
@@ -129,7 +129,7 @@ Mat* auto_close_line(Mat *image)
 
     /// Apply the specified morphology operation
     morphologyEx( *image, *dst, operation, element );
-    imshow( "auto_close_line", *dst );
+    //imshow( "auto_close_line", *dst );
     return dst;
 }
 
