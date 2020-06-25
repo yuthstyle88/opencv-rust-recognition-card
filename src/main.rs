@@ -459,8 +459,8 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     for card_tuple in cards.card.into_iter() {
         let (mut card_in, id, mut angle) = card_tuple;
         let file_param: Vector<i32> = Vector::new();
-        let fname = format!("test_{}.png", id);
-        imwrite(&fname, &card_in, &file_param);
+      //  let fname = format!("test_{}.png", id);
+        //imwrite(&fname, &card_in, &file_param);
         let width = card_in.cols();
         let height = card_in.rows();
         if width > height {
@@ -532,7 +532,7 @@ fn run() -> opencv::Result<()> {
             //dbg!(&increase);
             // recognition_card(&frame);
             let file_param: Vector<i32> = Vector::new();
-            imwrite("test.png", &frame, &file_param);
+           // imwrite("test.png", &frame, &file_param);
             let card_dataset = recognition_card(&frame);
             dbg!(card_dataset);
             continue;
