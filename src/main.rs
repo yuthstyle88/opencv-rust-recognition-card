@@ -12,8 +12,8 @@ extern {
 
 use opencv::{prelude::*, videoio, highgui, types};
 use opencv::imgcodecs::{imread, IMREAD_COLOR, IMREAD_GRAYSCALE, imwrite};
-use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value};
-use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, sort, sort_idx, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b};
+use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value, COLOR_BGR2HSV};
+use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, sort, sort_idx, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b, split, in_range};
 use opencv::highgui::{imshow, wait_key, named_window};
 use opencv::types::{VectorOfMat, VectorOfVec4i, VectorOfPoint, VectorOfPoint2f, VectorOfRect};
 use std::borrow::{BorrowMut, Borrow};
@@ -30,6 +30,7 @@ use opencv::objdetect::CASCADE_SCALE_IMAGE;
 use core::fmt;
 use opencv::ximgproc::get_structuring_element;
 use opencv::sys::cv_ml_ANN_MLP_create;
+use std::cmp::max;
 
 #[derive(Debug)]
 pub struct Cards {
@@ -546,7 +547,7 @@ fn main() {
 
     // run().unwrap();
 
-    let filename = format!("src/{}", "test.png");
+    let filename = format!("src/{}", "sp007.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,
@@ -681,17 +682,18 @@ fn get_contours(img: &Mat, vec: &mut Vector<Mat>, zero_offset: Point_<i32>) {
 
 fn get_count_red(img: &Mat) -> i32 {
 
-    // imshow("get count red", &img);
-    // let _key = wait_key(0);
+
 
     let mut c_red = 0;
     for y in 0..img.rows() {
         for x in 0..img.cols() {
 
             let color = img.at_pt::<Vec3b>(Point::new(x, y)).unwrap().0;
-            print!("{:?}", color);
-            if color[2] > 200 && 100 > color[0] && 100 > color[1]{
+            let ts = max(max(color[0], color[1]), color[2]);
+            // print!("ts -> {} b={} g={} r={}", ts, color[0], color[1], color[2]);
+            if ts == color[2] && color[1] < (ts / 2) && color[0] < (ts / 2) {
                 c_red += 1;
+                // println!(" c={}",c_red);
             }
         }
     }
