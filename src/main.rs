@@ -165,7 +165,7 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
     };
 
     let mut last_rank_y = 0;
-    let mut area_selected:f64 = 1000.;
+    let mut area_selected:f64 = 1500.;
     let mut idx = 0;
 
     // Find suit image
@@ -176,17 +176,17 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
         if area < area_selected {
             continue;
         }
-        // println!(">>> {} area selected -> {}", idx,  area);
+        println!(">>> {} area selected -> {}", idx,  area);
         let mut roi = bounding_rect(&cnt).unwrap();
         let out = Mat::roi(&src, roi).unwrap();
 
         if true == is_first {
             suit_img = out;
             is_first = false;
-            // println!(">>> {} suit -> {}", idx, area);
+            println!(">>> {} suit -> {}", idx, area);
         }else {
             rank_img = out;
-            // println!(">>> {} rank -> {}", idx, area);
+            println!(">>> {} rank -> {}", idx, area);
         }
     }
 
@@ -398,7 +398,7 @@ fn card_id(mut card: Mat, id: u8) -> Card {
 
     let is_big_card = chk_big_card(&card);
     println!(">>> is_big_card -> {}", is_big_card);
-    let mut x = 12;
+    let mut x = 7;
     // Cropped corner
     let mut corner_width = CORNER_WIDTH;
     if false == is_big_card {
@@ -407,7 +407,7 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     }
 
     // display_picture_and_wait("before cropped", &card);
-    let img_cropped = process_crop_img_by_size (&card,  x, 10, corner_width, CORNER_HEIGHT, is_show);
+    let img_cropped = process_crop_img_by_size (&card,  x, 5 , corner_width, CORNER_HEIGHT, is_show);
     let count_red = get_count_red(&img_cropped);
 
     // Resize image
@@ -532,7 +532,7 @@ fn main() {
 
     // run().unwrap();
 
-    let filename = format!("src/{}", "sp006.png");
+    let filename = format!("src/{}", "test.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,
