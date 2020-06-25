@@ -3,11 +3,12 @@ extern crate opencv;
 extern crate image;
 extern crate libm;
 extern crate glam;
+
 extern {
     // this is rustified prototype of the function from our C++ library
-    #[link(name="libhelper", kind="dynamic")]
-    fn auto_close_line(img: Mat)-> Mat;
-    fn test_image(img: Mat)-> Mat;
+    #[link(name = "libhelper", kind = "dynamic")]
+    fn auto_close_line(img: Mat) -> Mat;
+    fn test_image(img: Mat) -> Mat;
 }
 
 use opencv::{prelude::*, videoio, highgui, types};
@@ -103,10 +104,10 @@ fn split_card(src: &Mat, card: &mut Cards) {
 
     match find_contours(&thres_img, &mut vec, RETR_LIST, CHAIN_APPROX_NONE, zero_offset) {
         Ok(_ok) => {
-            println!("[OK] find contours");
+            //  println!("[OK] find contours");
         }
         Err(error) => {
-            println!("[KO] find contours: {}", error);
+            //   println!("[KO] find contours: {}", error);
         }
     };
     //let sort_img = vec.clone().unwrap();
@@ -140,8 +141,8 @@ fn split_card(src: &Mat, card: &mut Cards) {
 
 
         let id = get_card_location(roi.x, roi.y);
-        println!("id {} ", id);
-        let pair = (out, id,angle);
+        // println!("id {} ", id);
+        let pair = (out, id, angle);
         card.add(pair);
         //copy from contour  CROP
         idx += 1;
@@ -158,19 +159,19 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
     let mut vec = VectorOfMat::new();
     match find_contours(&src, &mut vec, RETR_LIST, CHAIN_APPROX_SIMPLE, zero_offset) {
         Ok(_ok) => {
-            println!("[OK] find contours");
+            //  println!("[OK] find contours");
         }
         Err(error) => {
-            println!("[KO] find contours: {}", error);
+            //   println!("[KO] find contours: {}", error);
         }
     };
 
     let mut last_rank_y = 0;
-    let mut area_selected:f64 = 1000.;
+    let mut area_selected: f64 = 1000.;
     let mut idx = 0;
 
     // Find suit image
-    for cnt in vec.iter(){
+    for cnt in vec.iter() {
         let area = contour_area(&cnt, false).unwrap();
         idx = idx + 1;
         // println!(">>> {} area -> {}", idx, area);
@@ -185,7 +186,7 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
             suit_img = out;
             is_first = false;
             // println!(">>> {} suit -> {}", idx, area);
-        }else {
+        } else {
             rank_img = out;
             // println!(">>> {} rank -> {}", idx, area);
         }
@@ -196,14 +197,14 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
 
 fn get_card_location(x: i32, y: i32) -> i32 {
 
-    println!("get_card_location() -> x= {}, y={}",x,y);
+     println!("get_card_location() -> x= {}, y={}",x,y);
     let pair = (x, y);
     let rs = match pair {
-        (x, y) if x > 900 && y > 330 => 1,
-        (x, y) if x > 700 && y > 330 => 2,
-        (x, y) if x > 280 && y > 330 => 3,
-        (x, y) if x >  50 && y > 330 => 4,
-        (x, y) if x > 800 && y > 80 => 5,
+        (x, y) if x > 900 && y > 300 => 1,
+        (x, y) if x > 700 && y > 300 => 2,
+        (x, y) if x > 280 && y > 300 => 3,
+        (x, y) if x > 50 && y > 300 => 4,
+        (x, y) if x > 800 && y > 50 => 5,
         (x, y) if x > 100 && y > 80 => 6,
         _ => 0,
     };
@@ -214,9 +215,9 @@ fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card
     let suit = CardLabel::from(suit);
 
 
-    let mut suit_name = suit ;
-    println!(": count_red -> {}", count_red);
-    println!(": suit -> {}", suit.to_string());
+    let mut suit_name = suit;
+    // println!(": count_red -> {}", count_red);
+    // println!(": suit -> {}", suit.to_string());
 
     if suit == CardLabel::Diamonds {  // red
         if 50 >= count_red { // is black
@@ -226,18 +227,18 @@ fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card
         if 50 < count_red { // is red
             suit_name = CardLabel::Diamonds;
         }
-    }else if suit == CardLabel::Hearts {  // red
+    } else if suit == CardLabel::Hearts {  // red
         if 50 >= count_red { // is black
             suit_name = CardLabel::Spades;
         }
-    }else if suit == CardLabel::Spades {  // black
+    } else if suit == CardLabel::Spades {  // black
         if 50 < count_red { // is red
             suit_name = CardLabel::Hearts;
         }
     }
-    println!(": suit_name -> {}", suit_name.to_string());
+    //  println!(": suit_name -> {}", suit_name.to_string());
 
-    Card { id: rank as u8, name: suit_name.to_string(), location}
+    Card { id: rank as u8, name: suit_name.to_string(), location }
 }
 
 
@@ -294,9 +295,9 @@ fn rankMatcher(rnk: Mat) -> usize {
         }
     }
     minindex += 1;
-    println!("Minimum White Pixel on Position: {}", minindex);
-    let file_param :Vector<i32> = Vector::new();
-    let filename_str = format!("Card_Imgs/Ranks/{}_v.jpg",(minindex));
+    // println!("Minimum White Pixel on Position: {}", minindex);
+    let file_param: Vector<i32> = Vector::new();
+    let filename_str = format!("Card_Imgs/Ranks/{}_v.jpg", (minindex));
     imwrite(filename_str.as_ref(), &rnk_resized, &file_param);
     minindex
 }
@@ -346,9 +347,9 @@ fn suitMatcher(suit: Mat) -> usize {
         }
     }
     minindex += 1;
-    println!("Minimum White Pixel on Position: {}", minindex);
-    let file_param :Vector<i32> = Vector::new();
-    let filename_str = format!("Card_Imgs/Suits/{}_v.jpg",(minindex));
+    //println!("Minimum White Pixel on Position: {}", minindex);
+    let file_param: Vector<i32> = Vector::new();
+    let filename_str = format!("Card_Imgs/Suits/{}_v.jpg", (minindex));
     imwrite(filename_str.as_ref(), &suit_resized, &file_param);
     // println!("Saved file.");
     minindex
@@ -377,7 +378,6 @@ fn rotate_image90(src: &Mat) -> Mat {
 }
 
 fn rotate_image(src: &Mat, angle: f64) -> Mat {
-
     let size = src.size().unwrap();
     let width = size.width;
     let height = size.height;
@@ -389,15 +389,14 @@ fn rotate_image(src: &Mat, angle: f64) -> Mat {
 }
 
 fn crop_card(src: &Mat, crop_size: f64) -> Mat {
-
     let mut img_cc = Mat::default().unwrap();
     let mut img_ts = Mat::default().unwrap();
     let mut img_cropped = Mat::default().unwrap();
     let is_show = false;
 
     process_img_gray(&src, &mut img_cc, is_show);
-    process_img_threshold(&img_cc,&mut img_ts,  50., 255., is_show);
-    let img_cropped = process_crop_by_img (src,  &img_ts, is_show);
+    process_img_threshold(&img_cc, &mut img_ts, 50., 255., is_show);
+    let img_cropped = process_crop_by_img(src, &img_ts, is_show);
 
     // let _result = imshow("crop_card cropped", &img_cropped);
     // let _key = wait_key(0);
@@ -410,7 +409,7 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     let is_show = false;
 
     let is_big_card = chk_big_card(&card);
-    println!(">>> is_big_card -> {}", is_big_card);
+    // println!(">>> is_big_card -> {}", is_big_card);
     let mut x = 7;
     // Cropped corner
     let mut corner_width = CORNER_WIDTH;
@@ -419,11 +418,11 @@ fn card_id(mut card: Mat, id: u8) -> Card {
         x = x + 5;
     }
 
-    display_picture_and_wait("before cropped", &card);
-    let img_cropped = process_crop_img_by_size (&card,  x, 5, corner_width, CORNER_HEIGHT, is_show);
-    display_picture_and_wait("img_cropped", &img_cropped);
+    // display_picture_and_wait("before cropped", &card);
+    let img_cropped = process_crop_img_by_size(&card, x, 5, corner_width, CORNER_HEIGHT, is_show);
+    //  display_picture_and_wait("img_cropped", &img_cropped);
     let count_red = get_count_red(&img_cropped);
-    println!(">>> count_red -> {}", count_red);
+    //   println!(">>> count_red -> {}", count_red);
 
     // Resize image
     let mut img_corner = Mat::default().unwrap();
@@ -435,19 +434,19 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     process_img_resize(&img_cropped, &mut img_corner, 4, is_show);
     process_img_bitwise_not(&img_corner, &mut img_bo, is_show);
     process_img_gray(&img_bo, &mut img_gray, is_show);
-    process_img_add_weighted(&img_gray, &mut img_aw,  is_show);
+    process_img_add_weighted(&img_gray, &mut img_aw, is_show);
     process_img_threshold(&img_gray, &mut img_ts, 90., 255., is_show);
 
     //display_picture_and_wait("card_id conner_top_left", &img_ts);
 
     let (rank_img, suit_img) = split_rank_suit(&img_ts);
-   // display_picture_and_wait ("rank_img", &rank_img);
-   // display_picture_and_wait("suit_img", &suit_img);
+    // display_picture_and_wait ("rank_img", &rank_img);
+    // display_picture_and_wait("suit_img", &suit_img);
 
     let rank_result = rankMatcher(rank_img);
-    println!(">>> rank_result -> {}", rank_result);
+    //println!(">>> rank_result -> {}", rank_result);
     let suit_result = suitMatcher(suit_img);
-    println!(">>> suit_result -> {}", suit_result);
+    //println!(">>> suit_result -> {}", suit_result);
 
     get_card_name(rank_result, suit_result, id, count_red)
 }
@@ -458,9 +457,9 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     let mut img_count = 0;
     let mut res = vec![];
     for card_tuple in cards.card.into_iter() {
-        let (mut card_in, id,mut angle) = card_tuple;
-        let file_param :Vector<i32> = Vector::new();
-        let fname = format!("test_{}.png",id);
+        let (mut card_in, id, mut angle) = card_tuple;
+        let file_param: Vector<i32> = Vector::new();
+        let fname = format!("test_{}.png", id);
         imwrite(&fname, &card_in, &file_param);
         let width = card_in.cols();
         let height = card_in.rows();
@@ -468,15 +467,15 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
             card_in = rotate_image90(&card_in);
         }
         let mut add_angle = 90.;
-        if angle  < -50.  {angle  =  add_angle + angle;} // else {angle = angle - 1.0};
+        if angle < -50. { angle = add_angle + angle; } // else {angle = angle - 1.0};
 
         //let angle = find_angle(&card_in);
-        println!(" {}. recognition_card->angle : {}", img_count, angle);
-       // display_picture_and_wait("card_in" , &card_in);
+        //println!(" {}. recognition_card->angle : {}", img_count, angle);
+        // display_picture_and_wait("card_in" , &card_in);
         let rotate_img = rotate_image(&card_in, angle as f64);
-       // display_picture_and_wait("rotate_img" , &rotate_img);
+        // display_picture_and_wait("rotate_img" , &rotate_img);
         let croped_img = crop_card(&rotate_img, 10000.);
-       // display_picture_and_wait("croped_img" , &croped_img);
+        // display_picture_and_wait("croped_img" , &croped_img);
         let card_result = card_id(croped_img, id as u8);
 
         res.push(card_result);
@@ -532,7 +531,7 @@ fn run() -> opencv::Result<()> {
 */
             //dbg!(&increase);
             // recognition_card(&frame);
-            let file_param :Vector<i32> = Vector::new();
+            let file_param: Vector<i32> = Vector::new();
             imwrite("test.png", &frame, &file_param);
             let card_dataset = recognition_card(&frame);
             dbg!(card_dataset);
@@ -544,8 +543,7 @@ fn run() -> opencv::Result<()> {
 
 
 fn main() {
-
-      run().unwrap();
+    run().unwrap();
 
     let filename = format!("src/{}", "sp007.png");
 
@@ -556,11 +554,10 @@ fn main() {
         }
     };
 
-    display_picture_and_wait("main()", &in_img);
+    // display_picture_and_wait("main()", &in_img);
 
     let card_dataset = recognition_card(&in_img);
     dbg!(card_dataset);
-
 
 
     // let filename = format!("src/{}", "sp003.png");
@@ -574,14 +571,14 @@ fn main() {
 
 // ============= Graphic ===============
 
-fn display_picture_and_wait (title :&str, img : &Mat ) {
+fn display_picture_and_wait(title: &str, img: &Mat) {
     imshow(title, img);
     let _key = wait_key(0);
 }
 
 // Canny image
-fn process_img_canny(img: &Mat, dst: &mut Mat, show: bool){
-    canny(&img,dst,0.,50.,3,false);
+fn process_img_canny(img: &Mat, dst: &mut Mat, show: bool) {
+    canny(&img, dst, 0., 50., 3, false);
     if true == show {
         imshow("process_img_canny", dst);
         let key = wait_key(0);
@@ -589,7 +586,7 @@ fn process_img_canny(img: &Mat, dst: &mut Mat, show: bool){
 }
 
 // Gray image
-fn process_img_gray(img: &Mat, dst: &mut Mat,  show: bool){
+fn process_img_gray(img: &Mat, dst: &mut Mat, show: bool) {
     cvt_color(&img, dst, COLOR_BGR2GRAY, 0).unwrap();
     if true == show {
         imshow("process_img_gray", dst);
@@ -598,7 +595,7 @@ fn process_img_gray(img: &Mat, dst: &mut Mat,  show: bool){
 }
 
 // Threshold image
-fn process_img_threshold(img: &Mat, dst: &mut Mat, thresh: f64, maxval: f64,  show: bool){
+fn process_img_threshold(img: &Mat, dst: &mut Mat, thresh: f64, maxval: f64, show: bool) {
     threshold(&img, dst, thresh, maxval, THRESH_BINARY | THRESH_OTSU);
     if true == show {
         imshow("process_img_threshold", dst);
@@ -607,7 +604,7 @@ fn process_img_threshold(img: &Mat, dst: &mut Mat, thresh: f64, maxval: f64,  sh
 }
 
 // Threshold image
-fn process_img_bitwise_not(img: &Mat, dst: &mut Mat,  show: bool){
+fn process_img_bitwise_not(img: &Mat, dst: &mut Mat, show: bool) {
     let temp = no_array().unwrap();
     bitwise_not(&img, dst, &temp);
     if true == show {
@@ -617,8 +614,7 @@ fn process_img_bitwise_not(img: &Mat, dst: &mut Mat,  show: bool){
 }
 
 // process_img_add_weighted
-fn process_img_add_weighted(img: &Mat, dst: &mut Mat,  show: bool) {
-
+fn process_img_add_weighted(img: &Mat, dst: &mut Mat, show: bool) {
     const COLOR: f64 = 50.0;
     let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
     let src2 = Mat::new_size_with_default(img.size().unwrap(), CV_8UC1, scalar).unwrap();
@@ -639,9 +635,9 @@ fn process_img_resize(img: &Mat, dst: &mut Mat, mul: i32, show: bool) {
 }
 
 // process_img_morphology_ex
-fn process_img_morphology_ex(img: &Mat,  dst: &mut  Mat, morph_size: i32,  morph_elem: i32, show: bool) {
-    let element = get_structuring_element( morph_elem, Size{ width:2*morph_size + 1, height:  2*morph_size+1} ).unwrap();
-    morphology_ex( &img, dst, 3, &element ,Point::new(-1,-1),1,BORDER_CONSTANT,morphology_default_border_value().unwrap());
+fn process_img_morphology_ex(img: &Mat, dst: &mut Mat, morph_size: i32, morph_elem: i32, show: bool) {
+    let element = get_structuring_element(morph_elem, Size { width: 2 * morph_size + 1, height: 2 * morph_size + 1 }).unwrap();
+    morphology_ex(&img, dst, 3, &element, Point::new(-1, -1), 1, BORDER_CONSTANT, morphology_default_border_value().unwrap());
 
     if true == show {
         display_picture_and_wait("process_img_morphology_ex", dst);
@@ -649,7 +645,7 @@ fn process_img_morphology_ex(img: &Mat,  dst: &mut  Mat, morph_size: i32,  morph
 }
 
 // process_crop_by_img
-fn process_crop_by_img (img: &Mat,  img_size: &Mat, show: bool) -> Mat {
+fn process_crop_by_img(img: &Mat, img_size: &Mat, show: bool) -> Mat {
     let mut roi = bounding_rect(img_size).unwrap();
     let dst = Mat::roi(&img, roi).unwrap();
     if true == show {
@@ -658,7 +654,7 @@ fn process_crop_by_img (img: &Mat,  img_size: &Mat, show: bool) -> Mat {
     dst
 }
 
-fn process_crop_img_by_size (img: &Mat,  x:i32, y:i32, width:i32, height:i32, show: bool) -> Mat {
+fn process_crop_img_by_size(img: &Mat, x: i32, y: i32, width: i32, height: i32, show: bool) -> Mat {
     let roi = Rect::new(x, y, width, height);
     let dst = Mat::roi(&img, roi).unwrap();
     if true == show {
@@ -672,22 +668,18 @@ fn process_crop_img_by_size (img: &Mat,  x:i32, y:i32, width:i32, height:i32, sh
 fn get_contours(img: &Mat, vec: &mut Vector<Mat>, zero_offset: Point_<i32>) {
     match find_contours(&img, vec, RETR_LIST, CHAIN_APPROX_NONE, zero_offset) {
         Ok(_ok) => {
-            println!("[OK] find contours");
+            //println!("[OK] find contours");
         }
         Err(error) => {
-            println!("[KO] find contours: {}", error);
+            //println!("[KO] find contours: {}", error);
         }
     };
 }
 
 fn get_count_red(img: &Mat) -> i32 {
-
-
-
     let mut c_red = 0;
     for y in 0..img.rows() {
         for x in 0..img.cols() {
-
             let color = img.at_pt::<Vec3b>(Point::new(x, y)).unwrap().0;
             let ts = max(max(color[0], color[1]), color[2]);
             // print!("ts -> {} b={} g={} r={}", ts, color[0], color[1], color[2]);
@@ -702,25 +694,24 @@ fn get_count_red(img: &Mat) -> i32 {
 }
 
 fn chk_big_card(img: &Mat) -> bool {
-
     let mut res = Mat::default().unwrap();
     unsafe {
-      res =   auto_close_line(img.clone().unwrap());
-       // println!(">>> num -> {}",num);
+        res = auto_close_line(img.clone().unwrap());
+        // println!(">>> num -> {}",num);
     };
 
     let mut is_big_card = false;
 
     let zero_offset = Point::new(0, 0);
-    let mut contours_vec= Vector::new();
-        get_contours(&res, &mut contours_vec, zero_offset);
-        for cnt in contours_vec.iter() {
-            let area = contour_area(&cnt, false).unwrap();
-            if 20000. > area {
-                continue;
-            }
-            is_big_card = true;
+    let mut contours_vec = Vector::new();
+    get_contours(&res, &mut contours_vec, zero_offset);
+    for cnt in contours_vec.iter() {
+        let area = contour_area(&cnt, false).unwrap();
+        if 20000. > area {
+            continue;
         }
+        is_big_card = true;
+    }
     is_big_card
 }
 
@@ -740,7 +731,6 @@ fn sub_image(img: &Mat, center: Point_<f32>, theta: f64, width: i32, height: i32
             r.at::<i32>(x2 as i32);
 
             warp_affine(img, new_img.borrow_mut(), &r, shape, INTER_LINEAR, BORDER_CONSTANT, Scalar::default());
-
         }
         _ => {}
     }
@@ -756,11 +746,11 @@ fn find_angle(src: &Mat) -> f32 {
     let size = src.size().unwrap();
     cvt_color(&src, &mut gray_img, COLOR_BGR2GRAY, 0).unwrap();
     let src = gray_img.clone().unwrap();
-    canny(&src,&mut gray_img,0.,50.,3,false);
+    canny(&src, &mut gray_img, 0., 50., 3, false);
     //imshow("CARD  SRC2  ", &gray_img);
     let _key = wait_key(0);
-   // const COLOR: f64 = 100.0;
-   // let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
+    // const COLOR: f64 = 100.0;
+    // let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
     //let src2 = Mat::new_size_with_default(size, CV_8UC1, scalar).unwrap();
     //let mut dst = Mat::default().unwrap();
     //compare(&gray_img, &src2, &mut dst, CMP_GT);
@@ -774,10 +764,10 @@ fn find_angle(src: &Mat) -> f32 {
     let mut vec = VectorOfMat::new(); //findContours accepts VECTOR of Mat|UMat|Vector
     match find_contours(&mut gray_img, &mut vec, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, zero_offset) {
         Ok(_ok) => {
-            println!("[OK] find contours angle");
+            // println!("[OK] find contours angle");
         }
         Err(error) => {
-            println!("[KO] find contours: {}", error);
+            //  println!("[KO] find contours: {}", error);
         }
     };
 
@@ -788,28 +778,28 @@ fn find_angle(src: &Mat) -> f32 {
     let mut large = 0.0;
     for cnt in vec.iter() {
         _min_area_rect = min_area_rect(&cnt).unwrap();
-        let area = contour_area(&cnt,false).unwrap();
-        println!("area {} angle {}",area, _min_area_rect.angle());
-         if area > large  {
-             large = area;
-             angle = _min_area_rect.angle()
-         }
+        let area = contour_area(&cnt, false).unwrap();
+        // println!("area {} angle {}",area, _min_area_rect.angle());
+        if area > large {
+            large = area;
+            angle = _min_area_rect.angle()
+        }
 
-       // let mut pts = [Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0)];
-       // _min_area_rect.points(&mut pts);
+        // let mut pts = [Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0)];
+        // _min_area_rect.points(&mut pts);
         //println!(" ANGLE : {}", _min_area_rect.angle());
-      /*  for j in 0..4 {
-            let scalar = Scalar { 0: [0.0, 0.0, 255.0, 0.0] };
-            let pt1 = Point { x: pts[j].x as i32, y: pts[j].x as i32 };
-            let n = (j + 1) % 4;
-            let pt2 = Point { x: pts[n].x as i32, y: pts[n].x as i32 };
-            line(&mut src, pt1, pt2, scalar, 1, LINE_AA, 0);
-        }*/
+        /*  for j in 0..4 {
+              let scalar = Scalar { 0: [0.0, 0.0, 255.0, 0.0] };
+              let pt1 = Point { x: pts[j].x as i32, y: pts[j].x as i32 };
+              let n = (j + 1) % 4;
+              let pt2 = Point { x: pts[n].x as i32, y: pts[n].x as i32 };
+              line(&mut src, pt1, pt2, scalar, 1, LINE_AA, 0);
+          }*/
     }
 
-    println!(">>> min_area_rect.angle() -> {} " , _min_area_rect.angle());
+    //println!(">>> min_area_rect.angle() -> {} " , _min_area_rect.angle());
     let mut add_angle = 90.;
-    if angle  < -50.  {angle  =  add_angle + angle;} else {angle = angle - 1.0};
+    if angle < -50. { angle = add_angle + angle; } else { angle = angle - 1.0 };
     angle
 }
 
@@ -839,6 +829,6 @@ fn get_angle(src: &Mat) -> f64 {
     }
     angle /= nb_lines as f64;
     let rs = angle * 180.0 / CV_PI as f64;
-    println!("Angle  {} : ", rs);
+    // println!("Angle  {} : ", rs);
     rs
 }
