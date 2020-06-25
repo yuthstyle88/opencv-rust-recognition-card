@@ -218,19 +218,19 @@ fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card
     println!(": suit -> {}", suit.to_string());
 
     if suit == CardLabel::Diamonds {  // red
-        if 1000 >= count_red { // is black
+        if 50 >= count_red { // is black
             suit_name = CardLabel::Clubs;
         }
     } else if suit == CardLabel::Clubs { // black
-        if 1000 < count_red { // is red
+        if 50 < count_red { // is red
             suit_name = CardLabel::Diamonds;
         }
     }else if suit == CardLabel::Hearts {  // red
-        if 1000 >= count_red { // is black
+        if 50 >= count_red { // is black
             suit_name = CardLabel::Spades;
         }
     }else if suit == CardLabel::Spades {  // black
-        if 1000 < count_red { // is red
+        if 50 < count_red { // is red
             suit_name = CardLabel::Hearts;
         }
     }
@@ -690,7 +690,7 @@ fn get_count_red(img: &Mat) -> i32 {
 
             let color = img.at_pt::<Vec3b>(Point::new(x, y)).unwrap().0;
             print!("{:?}", color);
-            if color[2] > 200 && color[2] > color[0] && color[2] > color[1]{
+            if color[2] > 200 && 100 > color[0] && 100 > color[1]{
                 c_red += 1;
             }
         }
