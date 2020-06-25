@@ -680,19 +680,20 @@ fn chk_big_card(img: &Mat) -> bool {
     display_picture_and_wait ("chk_big_card", &img );
     let mut img_c = 0;
     let  mut img_cn= Mat::default().unwrap();
+    let mut res = Mat::default().unwrap();
     unsafe {
-     let res =   auto_close_line(img.clone().unwrap());
+      res =   auto_close_line(img.clone().unwrap());
        // println!(">>> num -> {}",num);
         display_picture_and_wait ("auto_close_line", &res );
     };
 
     let mut is_big_card = false;
-   /* let zero_offset = Point::new(0, 0);
+   let zero_offset = Point::new(0, 0);
     let morph_size = 0;
     let morph_elem = 10;
     let is_show = false;
 
-    let mut img_gray= Mat::default().unwrap();
+  /*  let mut img_gray= Mat::default().unwrap();
     let mut img_cn= Mat::default().unwrap();
     let mut img_ts= Mat::default().unwrap();
     let mut contours_vec= Vector::new();
@@ -703,19 +704,19 @@ fn chk_big_card(img: &Mat) -> bool {
 
 
     process_img_threshold(&img_cn, &mut img_ts, 70., 255., is_show);
+*/
 
-
-
-    get_contours(&img_ts, &mut contours_vec, zero_offset);
-    let mut area_count = 0;
-    let mut tmp_area_count = 0;
-    for cnt in contours_vec.iter() {
-        let area = contour_area(&cnt, false).unwrap();
-        tmp_area_count = tmp_area_count + 1;
-    }
-    if 120 < tmp_area_count {
-        is_big_card = true;
-    }*/
+    let mut contours_vec= Vector::new();
+        get_contours(&res, &mut contours_vec, zero_offset);
+        let mut area_count = 0;
+        let mut tmp_area_count = 0;
+        for cnt in contours_vec.iter() {
+            let area = contour_area(&cnt, false).unwrap();
+            tmp_area_count = tmp_area_count + 1;
+        }
+        if 120 < tmp_area_count {
+            is_big_card = true;
+        }
 
     is_big_card
 }
