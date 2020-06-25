@@ -6,7 +6,7 @@ extern crate glam;
 extern {
     // this is rustified prototype of the function from our C++ library
     #[link(name="libhelper", kind="dynamic")]
-    fn auto_close_line(img: Mat, img2: &mut Mat)-> Mat;
+    fn auto_close_line(img: Mat)-> Mat;
     fn test_image(img: Mat)-> Mat;
 }
 
@@ -509,6 +509,8 @@ fn run() -> opencv::Result<()> {
 */
             //dbg!(&increase);
             // recognition_card(&frame);
+            let file_param :Vector<i32> = Vector::new();
+            imwrite("test.png", &frame, &file_param);
             let card_dataset = recognition_card(&frame);
             dbg!(card_dataset);
             continue;
@@ -520,7 +522,7 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    // run().unwrap();
+    run().unwrap();
 /*
     let filename = format!("src/{}", "sp.png");
 
@@ -679,9 +681,9 @@ fn chk_big_card(img: &Mat) -> bool {
     let mut img_c = 0;
     let  mut img_cn= Mat::default().unwrap();
     unsafe {
-     let num =   auto_close_line(img.clone().unwrap(),&mut img_cn);
+     let res =   auto_close_line(img.clone().unwrap());
        // println!(">>> num -> {}",num);
-        display_picture_and_wait ("auto_close_line", &num );
+        display_picture_and_wait ("auto_close_line", &res );
     };
 
     let mut is_big_card = false;

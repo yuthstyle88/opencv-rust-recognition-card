@@ -105,30 +105,32 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     imshow(wndname, image);
 }
 
-Mat* auto_close_line(Mat *image, Mat& image2)
+Mat* auto_close_line(Mat *image)
 {
     // Since MORPH_X : 2,3,4,5 and 6
-    Mat   dst;
-    Mat*  gray;
+    Mat *dst = new Mat();
+    Mat*  gray = new Mat();
    // imshow( "gray", image );
+    int morph_elem = 0;
     int operation = 4;
-    //cvtColor(image, *gray, COLOR_BGR2GRAY);
+    int morph_size = 1;
+    cvtColor(*image, *gray, COLOR_BGR2GRAY);
     //image2 = gray;
-   // Canny(gray, gray, 100, 190, 5);
+    Canny(*gray, *gray, 100, 190, 5);
 
-   /* int c = waitKey();
+    //int c = waitKey();
     //cvtColor(gray, gray, COLOR_BGR2GRAY);
-    threshold(gray, image, 190, 255, THRESH_BINARY_INV);
-    imshow( "threshold", image );
-    c = waitKey();
+    threshold(*gray, *image, 190, 255, THRESH_BINARY_INV);
+    imshow( "threshold", *image );
+    int c = waitKey();
     //fastNlMeansDenoising(gray, dst, 30.0, 7, 21);
     //imshow( "auto_close_line", dst );
     Mat element = getStructuringElement( morph_elem, Size( 2*morph_size , 2*morph_size), Point( morph_size, morph_size ) );
 
     /// Apply the specified morphology operation
-    morphologyEx( image, dst, operation, element );
-    imshow( "auto_close_line", dst );*/
-    return (Mat *) image;
+    morphologyEx( *image, *dst, operation, element );
+    imshow( "auto_close_line", *dst );
+    return dst;
 }
 
 
