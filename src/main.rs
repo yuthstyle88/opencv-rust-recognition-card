@@ -129,8 +129,8 @@ fn split_card(src: &Mat, card: &mut Cards) {
         let mut roi = bounding_rect(&cnt).unwrap();
         roi.height = roi.height + 15;
         roi.width = roi.width + 15;
-        roi.x = roi.x - 20;
-        roi.y = roi.y - 20;
+        roi.x = roi.x - 10;
+        roi.y = roi.y - 10;
 
 
         let out = Mat::roi(&src, roi).unwrap();
@@ -198,12 +198,12 @@ fn get_card_location(x: i32, y: i32) -> i32 {
     println!("get_card_location() -> x= {}, y={}",x,y);
     let pair = (x, y);
     let rs = match pair {
-        (x, y) if x > 800 && y > 300 => 1,
-        (x, y) if x > 700 && y > 300 => 2,
-        (x, y) if x > 300 && y > 300 => 3,
-        (x, y) if x > 100 && y > 300 => 4,
-        (x, y) if x > 800 && y > 95 => 5,
-        (x, y) if x > 100 && y > 95 => 6,
+        (x, y) if x > 1000 && y > 330 => 1,
+        (x, y) if x > 750 && y > 330 => 2,
+        (x, y) if x > 300 && y > 330 => 3,
+        (x, y) if x >  80 && y > 330 => 4,
+        (x, y) if x > 850 && y > 95 => 5,
+        (x, y) if x > 130 && y > 95 => 6,
         _ => 0,
     };
     rs
@@ -423,11 +423,11 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     process_img_add_weighted(&img_gray, &mut img_aw,  is_show);
     process_img_threshold(&img_gray, &mut img_ts, 90., 255., is_show);
 
-    // display_picture_and_wait("card_id conner_top_left", &img_ts);
+    display_picture_and_wait("card_id conner_top_left", &img_ts);
 
     let (rank_img, suit_img) = split_rank_suit(&img_ts);
-    // display_picture_and_wait("rank_img", &rank_img);
-    // display_picture_and_wait("suit_img", &suit_img);
+    display_picture_and_wait("rank_img", &rank_img);
+    display_picture_and_wait("suit_img", &suit_img);
 
     let rank_result = rankMatcher(rank_img);
     println!(">>> rank_result -> {}", rank_result);
@@ -532,7 +532,7 @@ fn main() {
 
     // run().unwrap();
 
-    let filename = format!("src/{}", "sp002.png");
+    let filename = format!("src/{}", "sp006.png");
 
     let mut in_img = match imread(&filename, IMREAD_COLOR) {
         Ok(ok) => ok,

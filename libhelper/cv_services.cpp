@@ -129,7 +129,7 @@ Mat* auto_close_line(Mat *image)
 
     /// Apply the specified morphology operation
     morphologyEx( *image, *dst, operation, element );
-    //imshow( "auto_close_line", *dst );
+    imshow( "auto_close_line", *dst );
     return dst;
 }
 
