@@ -7,6 +7,7 @@ extern {
     // this is rustified prototype of the function from our C++ library
     #[link(name="libhelper", kind="dynamic")]
     fn auto_close_line(img: Mat, img2: &mut Mat)-> Mat;
+    fn test_image(img: Mat)-> Mat;
 }
 
 use opencv::{prelude::*, videoio, highgui, types};
@@ -519,7 +520,7 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    run().unwrap();
+    // run().unwrap();
 /*
     let filename = format!("src/{}", "sp.png");
 
@@ -535,7 +536,12 @@ fn main() {
 
     let card_dataset = recognition_card(&in_img);
     dbg!(card_dataset);*/
+    let filename = format!("src/{}", "sp.png");
 
+    let in_img = imread(&filename, IMREAD_COLOR).unwrap();
+    display_picture_and_wait("main() 1", &in_img);
+    let x = unsafe { test_image(in_img) };
+    display_picture_and_wait("main() 2", &x);
 }
 
 
