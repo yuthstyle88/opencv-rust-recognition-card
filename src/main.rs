@@ -202,8 +202,8 @@ fn get_card_location(x: i32, y: i32) -> i32 {
         (x, y) if x > 750 && y > 330 => 2,
         (x, y) if x > 300 && y > 330 => 3,
         (x, y) if x >  80 && y > 330 => 4,
-        (x, y) if x > 850 && y > 95 => 5,
-        (x, y) if x > 130 && y > 95 => 6,
+        (x, y) if x > 800 && y > 80 => 5,
+        (x, y) if x > 130 && y > 80 => 6,
         _ => 0,
     };
     rs
@@ -423,11 +423,11 @@ fn card_id(mut card: Mat, id: u8) -> Card {
     process_img_add_weighted(&img_gray, &mut img_aw,  is_show);
     process_img_threshold(&img_gray, &mut img_ts, 90., 255., is_show);
 
-    display_picture_and_wait("card_id conner_top_left", &img_ts);
+    //display_picture_and_wait("card_id conner_top_left", &img_ts);
 
     let (rank_img, suit_img) = split_rank_suit(&img_ts);
-    display_picture_and_wait("rank_img", &rank_img);
-    display_picture_and_wait("suit_img", &suit_img);
+   // display_picture_and_wait ("rank_img", &rank_img);
+   // display_picture_and_wait("suit_img", &suit_img);
 
     let rank_result = rankMatcher(rank_img);
     println!(">>> rank_result -> {}", rank_result);
@@ -457,11 +457,11 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
 
         //let angle = find_angle(&card_in);
         println!(" {}. recognition_card->angle : {}", img_count, angle);
-        display_picture_and_wait("card_in" , &card_in);
+       // display_picture_and_wait("card_in" , &card_in);
         let rotate_img = rotate_image(&card_in, angle as f64);
-        display_picture_and_wait("rotate_img" , &rotate_img);
+       // display_picture_and_wait("rotate_img" , &rotate_img);
         let croped_img = crop_card(&rotate_img, 10000.);
-        display_picture_and_wait("croped_img" , &croped_img);
+       // display_picture_and_wait("croped_img" , &croped_img);
         let card_result = card_id(croped_img, id as u8);
 
         res.push(card_result);
@@ -741,7 +741,7 @@ fn find_angle(src: &Mat) -> f32 {
     cvt_color(&src, &mut gray_img, COLOR_BGR2GRAY, 0).unwrap();
     let src = gray_img.clone().unwrap();
     canny(&src,&mut gray_img,0.,50.,3,false);
-    imshow("CARD  SRC2  ", &gray_img);
+    //imshow("CARD  SRC2  ", &gray_img);
     let _key = wait_key(0);
    // const COLOR: f64 = 100.0;
    // let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
