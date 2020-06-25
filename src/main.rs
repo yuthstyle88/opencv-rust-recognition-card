@@ -29,10 +29,11 @@ use std::time::Duration;
 use opencv::objdetect::CASCADE_SCALE_IMAGE;
 use core::fmt;
 use opencv::ximgproc::get_structuring_element;
+use opencv::sys::cv_ml_ANN_MLP_create;
 
 #[derive(Debug)]
 pub struct Cards {
-    card: Vec<(Mat, i32)>
+    card: Vec<(Mat, i32, f32)>
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -47,7 +48,7 @@ enum CardLabel {
 pub struct Card {
     id: u8,
     name: String,
-    location: u8
+    location: u8,
 }
 
 impl fmt::Display for CardLabel {
@@ -60,7 +61,7 @@ impl Cards {
     fn new() -> Self {
         Self { card: vec![] }
     }
-    fn add(&mut self, card: (Mat, i32)) {
+    fn add(&mut self, card: (Mat, i32, f32)) {
         self.card.push(card)
     }
 }
@@ -119,9 +120,12 @@ fn split_card(src: &Mat, card: &mut Cards) {
         //dbg!(&cnt);
 
         let area = contour_area(&cnt, false).unwrap();
+
         if area < 30000f64 {
             continue;
         }
+        let _min_area_rect = min_area_rect(&cnt).unwrap();
+        let angle = _min_area_rect.angle();
         let mut roi = bounding_rect(&cnt).unwrap();
         roi.height = roi.height + 15;
         roi.width = roi.width + 15;
@@ -136,7 +140,7 @@ fn split_card(src: &Mat, card: &mut Cards) {
 
         let id = get_card_location(roi.x, roi.y);
         println!("id {} ", id);
-        let pair = (out, id);
+        let pair = (out, id,angle);
         card.add(pair);
         //copy from contour  CROP
         idx += 1;
@@ -438,15 +442,17 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     let mut img_count = 0;
     let mut res = vec![];
     for card_tuple in cards.card.into_iter() {
-
-        let (mut card_in, id) = card_tuple;
+        let (mut card_in, id,angle) = card_tuple;
+        let file_param :Vector<i32> = Vector::new();
+        let fname = format!("test_{}.png",id);
+        imwrite(&fname, &card_in, &file_param);
         let width = card_in.cols();
         let height = card_in.rows();
         if width > height {
             card_in = rotate_image90(&card_in);
         }
 
-        let angle = find_angle(&card_in);
+        //let angle = find_angle(&card_in);
         println!(" {}. recognition_card->angle : {}", img_count, angle);
 
         // imshow("recog_card in", &card_in);
@@ -722,18 +728,22 @@ fn sub_image(img: &Mat, center: Point_<f32>, theta: f64, width: i32, height: i32
 }
 
 fn find_angle(src: &Mat) -> f32 {
+
     // imshow("CARD  000 SRC  ", &src);
     // let _key = wait_key(0);
     let mut gray_img = src.clone().unwrap();
     let size = src.size().unwrap();
     cvt_color(&src, &mut gray_img, COLOR_BGR2GRAY, 0).unwrap();
-    const COLOR: f64 = 100.0;
-    let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
-    let src2 = Mat::new_size_with_default(size, CV_8UC1, scalar).unwrap();
-    let mut dst = Mat::default().unwrap();
-    compare(&gray_img, &src2, &mut dst, CMP_GT);
-    //imshow("CARD  SRC2  ", &dst);
-    //let _key = wait_key(0);
+    let src = gray_img.clone().unwrap();
+    canny(&src,&mut gray_img,0.,50.,3,false);
+    imshow("CARD  SRC2  ", &gray_img);
+    let _key = wait_key(0);
+   // const COLOR: f64 = 100.0;
+   // let scalar = Scalar::new(COLOR, COLOR, COLOR, COLOR);
+    //let src2 = Mat::new_size_with_default(size, CV_8UC1, scalar).unwrap();
+    //let mut dst = Mat::default().unwrap();
+    //compare(&gray_img, &src2, &mut dst, CMP_GT);
+
     //let angle =  get_angle(&gray_img);
     //TODO error check on convert
     // let _result = imshow("window_name", &dst);
@@ -741,7 +751,7 @@ fn find_angle(src: &Mat) -> f32 {
 
     let zero_offset = Point::new(0, 0);
     let mut vec = VectorOfMat::new(); //findContours accepts VECTOR of Mat|UMat|Vector
-    match find_contours(&mut dst, &mut vec, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, zero_offset) {
+    match find_contours(&mut gray_img, &mut vec, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, zero_offset) {
         Ok(_ok) => {
             println!("[OK] find contours angle");
         }
@@ -753,25 +763,30 @@ fn find_angle(src: &Mat) -> f32 {
     let mut src = Mat::default().unwrap();
     // println!("CONTOURS INFO: empty? : {} , lenght {}", vec.is_empty(), vec.len()); // FIXME ISSUE :? :#? debug trait not implemented
     let mut _min_area_rect = RotatedRect::default().unwrap();
+    let mut angle = 0.0;
+    let mut large = 0.0;
     for cnt in vec.iter() {
         _min_area_rect = min_area_rect(&cnt).unwrap();
-        let mut pts = [Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0)];
-        _min_area_rect.points(&mut pts);
+        let area = contour_area(&cnt,false).unwrap();
+        println!("area {} angle {}",area, _min_area_rect.angle());
+         if area > large  {
+             large = area;
+             angle = _min_area_rect.angle()
+         }
+
+       // let mut pts = [Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0), Point2f::new(0.0, 0.0)];
+       // _min_area_rect.points(&mut pts);
         //println!(" ANGLE : {}", _min_area_rect.angle());
-        for j in 0..4 {
+      /*  for j in 0..4 {
             let scalar = Scalar { 0: [0.0, 0.0, 255.0, 0.0] };
             let pt1 = Point { x: pts[j].x as i32, y: pts[j].x as i32 };
             let n = (j + 1) % 4;
             let pt2 = Point { x: pts[n].x as i32, y: pts[n].x as i32 };
             line(&mut src, pt1, pt2, scalar, 1, LINE_AA, 0);
-        }
+        }*/
     }
     let mut add_angle = 90.;
-    let mut angle = _min_area_rect.angle();
-
-    if (angle > -20.0) { add_angle = -1.0 }
-
-    angle = angle + add_angle;
+    if angle  < -50.  {angle  =  add_angle + angle;} else {angle = angle - 1.0};
     angle
 }
 
