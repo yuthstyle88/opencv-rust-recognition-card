@@ -418,9 +418,11 @@ fn card_id(mut card: Mat, id: u8) -> Card {
         x = x + 5;
     }
 
-    // display_picture_and_wait("before cropped", &card);
+    display_picture_and_wait("before cropped", &card);
     let img_cropped = process_crop_img_by_size (&card,  x, 5, corner_width, CORNER_HEIGHT, is_show);
+    display_picture_and_wait("img_cropped", &img_cropped);
     let count_red = get_count_red(&img_cropped);
+    println!(">>> count_red -> {}", count_red);
 
     // Resize image
     let mut img_corner = Mat::default().unwrap();
@@ -687,8 +689,8 @@ fn get_count_red(img: &Mat) -> i32 {
         for x in 0..img.cols() {
 
             let color = img.at_pt::<Vec3b>(Point::new(x, y)).unwrap().0;
-            // println!("{:?}", color);
-            if color[2] > color[0] && color[2] > color[1]{
+            print!("{:?}", color);
+            if color[2] > 200 && color[2] > color[0] && color[2] > color[1]{
                 c_red += 1;
             }
         }
