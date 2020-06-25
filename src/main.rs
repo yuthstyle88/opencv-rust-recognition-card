@@ -199,12 +199,12 @@ fn get_card_location(x: i32, y: i32) -> i32 {
     println!("get_card_location() -> x= {}, y={}",x,y);
     let pair = (x, y);
     let rs = match pair {
-        (x, y) if x > 1000 && y > 330 => 1,
-        (x, y) if x > 750 && y > 330 => 2,
-        (x, y) if x > 300 && y > 330 => 3,
-        (x, y) if x >  80 && y > 330 => 4,
+        (x, y) if x > 900 && y > 330 => 1,
+        (x, y) if x > 700 && y > 330 => 2,
+        (x, y) if x > 280 && y > 330 => 3,
+        (x, y) if x >  50 && y > 330 => 4,
         (x, y) if x > 800 && y > 80 => 5,
-        (x, y) if x > 130 && y > 80 => 6,
+        (x, y) if x > 100 && y > 80 => 6,
         _ => 0,
     };
     rs
@@ -545,7 +545,7 @@ fn run() -> opencv::Result<()> {
 
 fn main() {
 
-    // run().unwrap();
+      run().unwrap();
 
     let filename = format!("src/{}", "sp007.png");
 
