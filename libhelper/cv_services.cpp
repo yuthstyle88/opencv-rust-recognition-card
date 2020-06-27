@@ -105,6 +105,32 @@ static void drawSquares( Mat& image, const vector<vector<Point> >& squares )
     imshow(wndname, image);
 }
 
+bool check_is_red(Mat *image){
+    bool is_red = false;
+    Mat3b hsv;
+    cvtColor(*image, hsv, COLOR_BGR2HSV);
+    imshow("Before Mask Red", *image);
+    Mat1b mask1, mask2;
+    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
+    inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
+    int match_red = 0;
+    Mat1b mask = mask1 | mask2;
+
+    for (int y = 0; y < mask.rows; y++) {
+        for (int x = 0; x < mask.cols; x++) {
+            char16_t at_color = mask.at<uchar>(y, x);
+            //cout <<"at_color : "<< at_color <<endl;
+            if (at_color == 255)
+                match_red++;
+        }
+    }
+    if (match_red > 10) is_red = true;
+
+   // cout <<"match_red : "<< match_red <<endl;
+   // waitKey();
+    return is_red;
+}
+
 Mat* auto_close_line(Mat *image)
 {
     // Since MORPH_X : 2,3,4,5 and 6

@@ -9,12 +9,13 @@ extern {
     #[link(name = "libhelper", kind = "dynamic")]
     fn auto_close_line(img: Mat) -> Mat;
     fn test_image(img: Mat) -> Mat;
+    fn check_is_red(img: Mat) -> bool;
 }
 
 use opencv::{prelude::*, videoio, highgui, types};
 use opencv::imgcodecs::{imread, IMREAD_COLOR, IMREAD_GRAYSCALE, imwrite};
 use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value, COLOR_BGR2HSV, FONT_HERSHEY_PLAIN};
-use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b, split, in_range, Mat3b, Mat_, sort};
+use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b, split, in_range, Mat3b, Mat_, sort, Mat1b};
 use opencv::highgui::{imshow, wait_key, named_window, create_button, QT_PUSH_BUTTON};
 use opencv::types::{VectorOfMat, VectorOfVec4i, VectorOfPoint, VectorOfPoint2f, VectorOfRect};
 use std::borrow::{BorrowMut, Borrow};
@@ -34,6 +35,7 @@ use opencv::sys::cv_ml_ANN_MLP_create;
 use std::cmp::max;
 use std::ptr::null;
 use std::io::Write;
+use opencv::core::CmpTypes::CMP_EQ;
 
 #[derive(Debug)]
 pub struct Cards {
@@ -128,7 +130,7 @@ fn split_card(src: &Mat, card: &mut Cards) {
         if area < 40000f64 {
             continue;
         }
-        dbg!(&area);
+       // dbg!(&area);
         let _min_area_rect = min_area_rect(&cnt).unwrap();
         let angle = _min_area_rect.angle();
         let mut roi = bounding_rect(&cnt).unwrap();
@@ -199,7 +201,7 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
 }
 
 fn get_card_location(x: i32, y: i32) -> i32 {
-    println!("get_card_location() -> x= {}, y={}", x, y);
+    //println!("get_card_location() -> x= {}, y={}", x, y);
     let pair = (x, y);
     let rs = match pair {
         (x, y) if x > 900 && y > 300 => 1,
@@ -213,28 +215,28 @@ fn get_card_location(x: i32, y: i32) -> i32 {
     rs
 }
 
-fn get_card_name(rank: usize, suit: usize, location: u8, count_red: i32) -> Card {
+fn get_card_name(rank: usize, suit: usize, location: u8, is_red: bool) -> Card {
     let suit = CardLabel::from(suit);
 
 
     let mut suit_name = suit;
-    // println!(": count_red -> {}", count_red);
-    // println!(": suit -> {}", suit.to_string());
+      println!(": count_red -> {}", is_red);
+      println!(": suit -> {}", suit.to_string());
 
     if suit == CardLabel::Diamonds {  // red
-        if 50 >= count_red { // is black
+        if !is_red { // is black
             suit_name = CardLabel::Clubs;
         }
     } else if suit == CardLabel::Clubs { // black
-        if 50 < count_red { // is red
+        if is_red{ // is red
             suit_name = CardLabel::Diamonds;
         }
     } else if suit == CardLabel::Hearts {  // red
-        if 50 >= count_red { // is black
+        if !is_red { // is black
             suit_name = CardLabel::Spades;
         }
     } else if suit == CardLabel::Spades {  // black
-        if 50 < count_red { // is red
+        if is_red { // is red
             suit_name = CardLabel::Hearts;
         }
     }
@@ -422,8 +424,8 @@ fn card_id(mut card: Mat, id: u8) -> Card {
 
     // display_picture_and_wait("before cropped", &card);
     let img_cropped = process_crop_img_by_size(&card, x, 5, corner_width, CORNER_HEIGHT, is_show);
-    //  display_picture_and_wait("img_cropped", &img_cropped);
-    let count_red = get_count_red(&img_cropped);
+    //display_picture_and_wait("img_cropped", &img_cropped);
+    let count_red = unsafe { check_is_red(img_cropped.clone().unwrap()) };
     //   println!(">>> count_red -> {}", count_red);
 
     // Resize image
@@ -696,29 +698,47 @@ fn get_contours(img: &Mat, vec: &mut Vector<Mat>, zero_offset: Point_<i32>) {
         }
     };
 }
-
+/*
 fn get_count_red(img: &Mat) -> i32 {
+    imshow("Mask 1", &img);
+    wait_key(0);
+    let mut dst_hsv = Mat::default().unwrap();
+    let mut mask1 =   Mat::default().unwrap();
+    let mut mask2 =   Mat::default().unwrap();
+    cvt_color(&img,&mut dst_hsv,COLOR_BGR2HSV,0);
+
+    let lower_red = Scalar::new(90.-0., 50., 50., 50.);
+    let upper_red = Scalar::new(90.+10., 255., 255., 255.);
+    in_range(&dst_hsv,&lower_red,&upper_red,&mut mask1);
+
+    let lower_red = Scalar::new(170., 50., 50., 50.);
+    let upper_red = Scalar::new(180., 255., 255., 255.);
+    in_range(&dst_hsv,&lower_red,&upper_red,&mut mask2);
+    imshow("Mask 2", &mask1);
+    wait_key(0);
+
     let mut c_red = 0;
+    /*
     for y in 0..img.rows() {
         for x in 0..img.cols() {
             let color = img.at_pt::<Vec3b>(Point::new(x, y)).unwrap().0;
             let ts = max(max(color[0], color[1]), color[2]);
-            // print!("ts -> {} b={} g={} r={}", ts, color[0], color[1], color[2]);
+             print!("ts -> {} b={} g={} r={}", ts, color[0], color[1], color[2]);
             if ts == color[2] && color[1] < (ts / 2) && color[0] < (ts / 2) {
                 c_red += 1;
                 // println!(" c={}",c_red);
             }
         }
     }
-
+*/
     c_red
-}
+}*/
 
 fn chk_big_card(img: &Mat) -> bool {
     let mut res = Mat::default().unwrap();
     cvt_color(&img, &mut res, IMREAD_GRAYSCALE,0);
     let img = res.clone().unwrap();
-    process_img_canny(&img, &mut res, true);
+    process_img_canny(&img, &mut res, false);
     let img = res.clone().unwrap();
     process_img_morphology_ex(&img, &mut res, 0, 1, false);
     /*unsafe {
