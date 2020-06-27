@@ -121,13 +121,14 @@ fn split_card(src: &Mat, card: &mut Cards) {
     //sort(&vec, &mut dst, 0);
 
     for cnt in vec.iter() {
-        //dbg!(&cnt);
+
 
         let area = contour_area(&cnt, false).unwrap();
 
-        if area < 30000f64 {
+        if area < 40000f64 {
             continue;
         }
+        dbg!(&area);
         let _min_area_rect = min_area_rect(&cnt).unwrap();
         let angle = _min_area_rect.angle();
         let mut roi = bounding_rect(&cnt).unwrap();
@@ -719,7 +720,7 @@ fn chk_big_card(img: &Mat) -> bool {
     let img = res.clone().unwrap();
     process_img_canny(&img, &mut res, true);
     let img = res.clone().unwrap();
-    process_img_morphology_ex(&img, &mut res, 0, 1, true);
+    process_img_morphology_ex(&img, &mut res, 0, 1, false);
     /*unsafe {
         res = auto_close_line(img.clone().unwrap());
         // println!(">>> num -> {}",num);
