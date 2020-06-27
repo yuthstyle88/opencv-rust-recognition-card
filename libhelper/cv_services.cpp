@@ -109,7 +109,7 @@ bool check_is_red(Mat *image){
     bool is_red = false;
     Mat3b hsv;
     cvtColor(*image, hsv, COLOR_BGR2HSV);
-    imshow("Before Mask Red", *image);
+    //imshow("Before Mask Red", *image);
     Mat1b mask1, mask2;
     inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
     inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
