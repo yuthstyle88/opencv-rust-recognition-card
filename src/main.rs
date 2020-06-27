@@ -13,9 +13,9 @@ extern {
 
 use opencv::{prelude::*, videoio, highgui, types};
 use opencv::imgcodecs::{imread, IMREAD_COLOR, IMREAD_GRAYSCALE, imwrite};
-use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value, COLOR_BGR2HSV};
-use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, sort, sort_idx, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b, split, in_range};
-use opencv::highgui::{imshow, wait_key, named_window};
+use opencv::imgproc::{COLOR_BGR2GRAY, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvt_color, find_contours, line, LINE_AA, min_area_rect, draw_contours, THRESH_BINARY, threshold, warp_affine, get_rotation_matrix_2d, INTER_LINEAR, hough_lines_p, resize, rectangle, THRESH_BINARY_INV, gaussian_blur, bounding_rect, RETR_LIST, RETR_TREE, THRESH_OTSU, morphology_ex, RETR_CCOMP, canny, CHAIN_APPROX_NONE, contour_area, FILLED, put_text, COLOR_BGR2RGB, morphology_default_border_value, COLOR_BGR2HSV, FONT_HERSHEY_PLAIN};
+use opencv::core::{Point, Mat, ToInputArray, MatTrait, InputArray, RotatedRect, MatTraitManual, Point2f, Scalar, Point2i, RotatedRectTrait, compare, CMP_GT, Size_, Point_, BORDER_CONSTANT, rotate, no_array, bitwise_not, CV_PI, CV_8UC1, Rect2f, Point3f, Size, Rect, Size2f, ToOutputArray, Moments, absdiff, min, BORDER_DEFAULT, add_weighted, Vector, Vec3b, split, in_range, Mat3b, Mat_, sort};
+use opencv::highgui::{imshow, wait_key, named_window, create_button, QT_PUSH_BUTTON};
 use opencv::types::{VectorOfMat, VectorOfVec4i, VectorOfPoint, VectorOfPoint2f, VectorOfRect};
 use std::borrow::{BorrowMut, Borrow};
 use libm::atan2;
@@ -29,9 +29,11 @@ use opencv::videoio::{VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT}
 use std::time::Duration;
 use opencv::objdetect::CASCADE_SCALE_IMAGE;
 use core::fmt;
-use opencv::ximgproc::get_structuring_element;
+use opencv::imgproc::get_structuring_element;
 use opencv::sys::cv_ml_ANN_MLP_create;
 use std::cmp::max;
+use std::ptr::null;
+use std::io::Write;
 
 #[derive(Debug)]
 pub struct Cards {
@@ -116,7 +118,7 @@ fn split_card(src: &Mat, card: &mut Cards) {
     let mut idx = 0;
     // let maxresult: i32 = 2147483647;
     //let mut hierachy = VectorOfMat::new();
-    sort(&vec, &mut dst, 0);
+    //sort(&vec, &mut dst, 0);
 
     for cnt in vec.iter() {
         //dbg!(&cnt);
@@ -196,8 +198,7 @@ fn split_rank_suit(src: &Mat) -> (Mat, Mat) {
 }
 
 fn get_card_location(x: i32, y: i32) -> i32 {
-
-     println!("get_card_location() -> x= {}, y={}",x,y);
+    println!("get_card_location() -> x= {}, y={}", x, y);
     let pair = (x, y);
     let rs = match pair {
         (x, y) if x > 900 && y > 300 => 1,
@@ -459,7 +460,7 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     for card_tuple in cards.card.into_iter() {
         let (mut card_in, id, mut angle) = card_tuple;
         let file_param: Vector<i32> = Vector::new();
-      //  let fname = format!("test_{}.png", id);
+        //  let fname = format!("test_{}.png", id);
         //imwrite(&fname, &card_in, &file_param);
         let width = card_in.cols();
         let height = card_in.rows();
@@ -485,10 +486,25 @@ fn recognition_card(in_img: &Mat) -> Vec<Card> {
     }
     res
 }
+/*
 
-fn run() -> opencv::Result<()> {
+pub fn progress_function<F>(f: F) -> Option<Box<dyn  FnMut()>>
+    where
+        F: FnMut(f64) -> () + Send + Sync + 'static,
+{
+    Some(Box::new(f))
+}
+*/
+
+
+fn run(callback: Option<Box<dyn FnMut(i32) + Send + Sync + 'static>>) -> opencv::Result<()> {
     let window = "video capture";
     named_window(window, 1)?;
+    const COLOR: f64 = 50.0;
+
+
+    //create_button(window, callback , QT_PUSH_BUTTON, true);
+    create_button("button2", callback, QT_PUSH_BUTTON, true);
     #[cfg(feature = "opencv-32")]
         let mut cam = VideoCapture::new_default(1)?;  // 0 is the default camera
     #[cfg(not(feature = "opencv-32"))]
@@ -532,8 +548,9 @@ fn run() -> opencv::Result<()> {
             //dbg!(&increase);
             // recognition_card(&frame);
             let file_param: Vector<i32> = Vector::new();
-           // imwrite("test.png", &frame, &file_param);
+            // imwrite("test.png", &frame, &file_param);
             let card_dataset = recognition_card(&frame);
+
             dbg!(card_dataset);
             continue;
         }
@@ -543,7 +560,10 @@ fn run() -> opencv::Result<()> {
 
 
 fn main() {
-    run().unwrap();
+    let mut callback = move |text1: i32| {
+        15;
+    };
+    run(Some(Box::new(callback))).unwrap();
 
     let filename = format!("src/{}", "sp007.png");
 
@@ -635,9 +655,9 @@ fn process_img_resize(img: &Mat, dst: &mut Mat, mul: i32, show: bool) {
 }
 
 // process_img_morphology_ex
-fn process_img_morphology_ex(img: &Mat, dst: &mut Mat, morph_size: i32, morph_elem: i32, show: bool) {
-    let element = get_structuring_element(morph_elem, Size { width: 2 * morph_size + 1, height: 2 * morph_size + 1 }).unwrap();
-    morphology_ex(&img, dst, 3, &element, Point::new(-1, -1), 1, BORDER_CONSTANT, morphology_default_border_value().unwrap());
+fn process_img_morphology_ex(img: &Mat, dst: &mut Mat, morph_elem: i32, morph_size: i32, show: bool) {
+    let element = get_structuring_element(morph_elem, Size { width: 2 * morph_size + 1, height: 2 * morph_size + 1 }, Point::new(-1, -1)).unwrap();
+    morphology_ex(&img, dst, 4, &element, Point::new(-1, -1), 1, BORDER_CONSTANT, morphology_default_border_value().unwrap());
 
     if true == show {
         display_picture_and_wait("process_img_morphology_ex", dst);
@@ -695,10 +715,15 @@ fn get_count_red(img: &Mat) -> i32 {
 
 fn chk_big_card(img: &Mat) -> bool {
     let mut res = Mat::default().unwrap();
-    unsafe {
+    cvt_color(&img, &mut res, IMREAD_GRAYSCALE,0);
+    let img = res.clone().unwrap();
+    process_img_canny(&img, &mut res, true);
+    let img = res.clone().unwrap();
+    process_img_morphology_ex(&img, &mut res, 0, 1, true);
+    /*unsafe {
         res = auto_close_line(img.clone().unwrap());
         // println!(">>> num -> {}",num);
-    };
+    };*/
 
     let mut is_big_card = false;
 
